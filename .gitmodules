@@ -7,3 +7,6 @@
 [submodule "modules/bump"]
 	path = modules/bump
 	url = https://github.com/kikito/bump.lua
+[submodule "modules/inspect"]
+	path = modules/inspect
+	url = https://github.com/kikito/inspect.lua.git
