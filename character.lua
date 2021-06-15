@@ -1,6 +1,5 @@
 local enums = require "enums"
 require "position"
-local inspect = require "inspect/inspect"
 
 Character = {}
 

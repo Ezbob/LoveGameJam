@@ -1,12 +1,12 @@
 [submodule "anim8"]
-	path = anim8
+	path = modules/anim8
 	url = https://github.com/kikito/anim8
 [submodule "bump.lua"]
-	path = bump
+	path = modules/bump
 	url = https://github.com/kikito/bump.lua
 [submodule "hump"]
-	path = hump
+	path = modules/hump
 	url = https://github.com/vrld/hump
 [submodule "inspect.lua"]
-	path = inspect
+	path = modules/inspect
 	url = https://github.com/kikito/inspect.lua
