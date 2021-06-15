@@ -1,76 +1,79 @@
 local enums = require "enums"
 local bump = require "bump/bump"
 local anim8 = require "anim8/anim8"
-local inspect = require "inspect/inspect"
 Timer = require "hump.timer"
 require "character"
 require "helper_functions"
 require "ai"
 require "scoring"
 
-in_focus = false
-debug = true
-screen_values = { width = 1600, height = 960 }
-game_speed = 1
-detection_zone_width = 200
-debug_font_size = 16
-game_over = false
+IN_FOCUS = false
+DEBUG = true
+SCREEN_VALUES = { width = 1600, height = 960 }
+GAME_SPEED = 1
+DETECTION_ZONE_WIDTH = 200
+DEBUG_FONT_SIZE = 16
+GAME_OVER = false
 
-love.window.setMode( screen_values.width, screen_values.height, { resizable = true, vsync = true, minwidth = 1600, minheight= 960 , fullscreen = false })
+love.window.setMode( SCREEN_VALUES.width, SCREEN_VALUES.height, { resizable = true, vsync = true, minwidth = 1600, minheight= 960 , fullscreen = false })
 love.window.setTitle( "Wrong Neighborhood" )
 
-has_joysticks = #love.joystick.getJoysticks() > 0
+HAS_JOYSTICKS = #love.joystick.getJoysticks() > 0
 
 
-gameoverColors =  {
+GAMEOVER_COLORS =  {
     G = 255,
     B = 255
 }
 
-entities = {
+H_SCALE = 2
+V_SCALE = 2
+
+ENTITIES = {
     players = {},
     enemies = {},
     objects = {},
     road = {
-        sidewalk = {},
-        street = {},
-        street_lines = {},
+        SIDEWALK = {},
+        STREET = {},
+        STREET_LINES = {},
         planks = {},
         planks_top = {},
-        plank_and_sidewalk = {},
+        PLANK_AND_SIDEWALK = {},
         barricades = {},
-        gutter = {},
+        GUTTER = {},
         flipped_gutter = {}
     },
     background = {}
 }
 
-camera_rectangle = {
+CAMERA_RECTANGLE = {
     position = {
         x = 0,
         y = 0
     },
-    width = screen_values.width,
-    height = screen_values.height
+    width = SCREEN_VALUES.width,
+    height = SCREEN_VALUES.height
 }
+
+FONT = nil
 
 
 function love.focus(focus)
-    in_focus = focus
+    IN_FOCUS = focus
 end
 
 function love.load(arg)
-    h_scale = 2
-    v_scale = 2
+
     -- Load Textures
-    font = love.graphics.newFont("Assets/PressStart2P.ttf", debug_font_size)
-    love.graphics.setFont(font)
-    world = bump.newWorld()
-    images = {}
+    FONT = love.graphics.newFont("Assets/PressStart2P.ttf", DEBUG_FONT_SIZE)
+    love.graphics.setFont(FONT)
+    WORLD = bump.newWorld()
+    IMAGES = {}
 
     STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
 
-    player1 = Character:newPlayerChar(100, screen_values.height * 0.7, 200, 10, 1, STD_CHR_WIDTH, STD_CHR_HEIGHT)
+    local player1 = Character:newPlayerChar(100, SCREEN_VALUES.height * 0.7, 200, 10, 1, STD_CHR_WIDTH, STD_CHR_HEIGHT)
 
     local torso_spacing = 25
     local head_room = 58
@@ -85,16 +88,16 @@ function love.load(arg)
         }
     )
 
-    if has_joysticks then
+    if HAS_JOYSTICKS then
         player1.control_scheme = enums.control_schemes.controller
     end
 
-    table.insert(entities.players, player1)
+    table.insert(ENTITIES.players, player1)
 
     Score:setupTimer(0)
     Score:setupScoreCount(0)
 
-    imageAssets = {
+    IMAGE_ASSETS = {
         player1 = {
             idle = love.graphics.newImage("Assets/miniplayer_idle.png"),
             punch = love.graphics.newImage("Assets/miniplayer_punch.png"),
@@ -120,7 +123,7 @@ function love.load(arg)
     }
 
 
-    local char = imageAssets['player1']
+    local char = IMAGE_ASSETS['player1']
     local h = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.idle:getWidth(), char.idle:getHeight())
     local j = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.punch:getWidth(), char.punch:getHeight())
     local k = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.walk:getWidth(), char.walk:getHeight())
@@ -128,7 +131,7 @@ function love.load(arg)
     local m = anim8.newGrid(64, 104, char.death:getWidth(), char.death:getHeight())
     local stun = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.stun:getWidth(), char.stun:getHeight())
 
-    char = imageAssets['punk']
+    char = IMAGE_ASSETS['punk']
     local epi = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.idle:getWidth(), char.idle:getHeight())
     local epk = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.kick:getWidth(), char.kick:getHeight())
     local epp = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.punch:getWidth(), char.punch:getHeight())
@@ -136,13 +139,13 @@ function love.load(arg)
     local epd = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.death:getWidth(), char.death:getHeight())
     local epstun = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.stun:getWidth(), char.stun:getHeight())
 
-    char = imageAssets['heavy']
+    char = IMAGE_ASSETS['heavy']
     local ehi = anim8.newGrid(64, 104, char.idle:getWidth(), char.idle:getHeight())
     local ehk = anim8.newGrid(64, 104, char.kick:getWidth(), char.kick:getHeight())
     local ehp = anim8.newGrid(64, 104, char.punch:getWidth(), char.punch:getHeight())
     local ehw = anim8.newGrid(64, 104, char.walk:getWidth(), char.walk:getHeight())
 
-    animationAssets = {
+    ANIMATION_ASSETS = {
         player1 = {
             idle = anim8.newAnimation(h('1-4', 1), 0.25),
             punch = anim8.newAnimation(j('1-4', 1), 0.1),
@@ -167,26 +170,26 @@ function love.load(arg)
         }
     }
     -- Init map
-    cars = love.graphics.newImage("Assets/cars.png")
-    green_car = love.graphics.newQuad(0, 0, 128, 128, cars:getWidth(), cars:getHeight())
-    yellow_car = love.graphics.newQuad(128, 0, 128, 128, cars:getWidth(), cars:getHeight())
-    red_car = love.graphics.newQuad(256, 0, 128, 128, cars:getWidth(), cars:getHeight())
-    blue_car = love.graphics.newQuad(256 + 128, 0, 128, 128, cars:getWidth(), cars:getHeight())
+    CARS = love.graphics.newImage("Assets/CARS.png")
+    GREEN_CAR = love.graphics.newQuad(0, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
+    YELLOW_CAR = love.graphics.newQuad(128, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
+    RED_CAR = love.graphics.newQuad(256, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
+    BLUE_CAR = love.graphics.newQuad(256 + 128, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
 
-    obstacles = love.graphics.newImage("Assets/obstacles_small.png")
-    standing_barrel = love.graphics.newQuad(0, 0, 64, 64, obstacles:getWidth(), obstacles:getHeight())
-    vertical_barrel = love.graphics.newQuad(64, 0, 64, 64, obstacles:getWidth(), obstacles:getHeight())
-    diagonal_barrel = love.graphics.newQuad(128, 0, 64, 64, obstacles:getWidth(), obstacles:getHeight())
-    barricade_quad = love.graphics.newQuad(128 + 64, 0, 64, 64, obstacles:getWidth(), obstacles:getHeight())
+    OBSTACLES = love.graphics.newImage("Assets/obstacles_small.png")
+    STANDING_BARREL = love.graphics.newQuad(0, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
+    VERTICAL_BARREL = love.graphics.newQuad(64, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
+    DIAGONAL_BARREL = love.graphics.newQuad(128, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
+    BARRICADE_QUAD = love.graphics.newQuad(128 + 64, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
 
-    street = love.graphics.newImage("Assets/asphalt.png")
-    asphalt = love.graphics.newQuad(0, 0, 64, 64, street:getWidth(), street:getHeight())
-    plank_and_sidewalk = love.graphics.newQuad(64, 0, 64, 64, street:getWidth(), street:getHeight())
-    plank = love.graphics.newQuad(128, 0, 64, 64, street:getWidth(), street:getHeight())
-    plank_top = love.graphics.newQuad(192, 0, 64, 64, street:getWidth(), street:getHeight())
-    gutter = love.graphics.newQuad(192 + 64, 0, 64, 64, street:getWidth(), street:getHeight())
-    sidewalk = love.graphics.newQuad(192 + 64 * 2, 0, 64, 64, street:getWidth(), street:getHeight())
-    street_lines = love.graphics.newQuad(192 + 64 * 3, 0, 64, 64, street:getWidth(), street:getHeight())
+    STREET = love.graphics.newImage("Assets/ASPHALT.png")
+    ASPHALT = love.graphics.newQuad(0, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
+    PLANK_AND_SIDEWALK = love.graphics.newQuad(64, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
+    PLANK = love.graphics.newQuad(128, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
+    PLANK_TOP = love.graphics.newQuad(192, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
+    GUTTER = love.graphics.newQuad(192 + 64, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
+    SIDEWALK = love.graphics.newQuad(192 + 64 * 2, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
+    STREET_LINES = love.graphics.newQuad(192 + 64 * 3, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
 
     player1:setAniState('idle')
 
@@ -203,7 +206,7 @@ function love.load(arg)
         }
     )
 
-    table.insert(entities.enemies, punk_enemy)
+    table.insert(ENTITIES.enemies, punk_enemy)
 
     punk_enemy = new_punk(700, 650, STD_CHR_WIDTH, STD_CHR_HEIGHT)
 
@@ -216,89 +219,89 @@ function love.load(arg)
         }
     )
 
-    table.insert(entities.enemies, punk_enemy)
+    table.insert(ENTITIES.enemies, punk_enemy)
 
-    for index, enemy in ipairs(entities.enemies) do
+    for index, enemy in ipairs(ENTITIES.enemies) do
         enemy:faceLeft()
     end
 
-    init_world(world)
+    INIT_WORLD(WORLD)
 end
 
-function init_world(world)
+function INIT_WORLD(WORLD)
     local bbox_width, bbox_height
 
-    for i = 1, #entities.players, 1 do
-        local player = entities.players[i]
+    for i = 1, #ENTITIES.players, 1 do
+        local player = ENTITIES.players[i]
         player.name = "player" .. i
 
         bbox_width, bbox_height = player:getBboxDimensions()
-        world:add( player, player.position.x, player.position.y, bbox_width, bbox_height)
+        WORLD:add( player, player.position.x, player.position.y, bbox_width, bbox_height)
         player:setKickBox(26, 20) -- Set the width and height of the punch kick boxes
         player:setPunchBox(22, 16)
     end
 
-    for i = 1, #entities.enemies, 1 do
-        local enemy = entities.enemies[i]
+    for i = 1, #ENTITIES.enemies, 1 do
+        local enemy = ENTITIES.enemies[i]
 
         bbox_width, bbox_height = enemy:getBboxDimensions()
         enemy.name = "enemy" .. enemy.kind .. i
-        world:add( enemy, enemy.position.x, enemy.position.y, bbox_width, bbox_height)
+        WORLD:add( enemy, enemy.position.x, enemy.position.y, bbox_width, bbox_height)
         enemy:setKickBox(26, 20)
         enemy:setPunchBox(22, 16)
     end
 
     for i = 0, 275, 1 do
-        table.insert(entities.road.planks_top, { position = { x = i * 58, y = screen_values.height * (2/5) - 94 - 64 }, width = 64, height = 64 })
-        table.insert(entities.road.planks, { position = { x = i * 58, y = screen_values.height * (2/5) - 94 }, width = 64, height = 64 })
-        table.insert(entities.road.plank_and_sidewalk, { position = { x = i * 58, y = screen_values.height * (2/5) - 30 }, width = 64, height = 64 })
-        table.insert(entities.road.sidewalk, { position = { x = i * 58, y = screen_values.height * (2/5) + 34 }, width = 64, height = 64 })
-        table.insert(entities.road.gutter, { position = { x = i * 58, y = screen_values.height * (2/5) + 98 }, width = 64, height = 64 })
-        table.insert(entities.road.street, { position = { x = i * 58, y = screen_values.height * (2/5) + 98 + 64 }, width = 64, height = 64 })
-        table.insert(entities.road.street_lines, { position = { x = i * 58, y = screen_values.height * (2/5) + 98 + 64 * 3 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.planks_top, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94 - 64 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.planks, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.PLANK_AND_SIDEWALK, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 30 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.SIDEWALK, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 34 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.GUTTER, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.STREET, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64 }, width = 64, height = 64 })
+        table.insert(ENTITIES.road.STREET_LINES, { position = { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64 * 3 }, width = 64, height = 64 })
     end
 
-    world:add( { name = "left bounding box"}, 5, 0, 1, screen_values.height)
-    world:add( { name = "top bounding box"}, 5, screen_values.height * (2/5), screen_values.width * 10, 1)
-    world:add( { name = "bottom bounding box"}, 5, screen_values.height * 0.9, screen_values.width * 10, 1)
-    world:add( { name = "right bounding box"}, screen_values.width * 10, 0, 1, screen_values.height)
+    WORLD:add( { name = "left bounding box"}, 5, 0, 1, SCREEN_VALUES.height)
+    WORLD:add( { name = "top bounding box"}, 5, SCREEN_VALUES.height * (2/5), SCREEN_VALUES.width * 10, 1)
+    WORLD:add( { name = "bottom bounding box"}, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
+    WORLD:add( { name = "right bounding box"}, SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
 
-    world:add( { name = "1st left barricade"}, 5, 500, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = 5, y = 500 }, width = 64, height = 64 })
-    world:add( { name = "2nd left barricade"}, 5, 500 + 64, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = 5, y = 500 + 64 }, width = 64, height = 64 })
-    world:add( { name = "3rd left barricade"}, 5, 500 + 64 * 2, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = 5, y = 500 + 64 * 2 }, width = 64, height = 64 })
-    world:add( { name = "4rd left barricade"}, 5, 500 + 64 * 3, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = 5, y = 500 + 64 * 3 }, width = 64, height = 64 })
-    world:add( { name = "5th left barricade"}, 5, 500 + 64 * 4, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = 5, y = 500 + 64 * 4 }, width = 64, height = 64 })
-    world:add( { name = "6th left barricade"}, 5, 500 + 64 * 5, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = 5, y = 500 + 64 * 5 }, width = 64, height = 64 })
+    WORLD:add( { name = "1st left barricade"}, 5, 500, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = 5, y = 500 }, width = 64, height = 64 })
+    WORLD:add( { name = "2nd left barricade"}, 5, 500 + 64, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = 5, y = 500 + 64 }, width = 64, height = 64 })
+    WORLD:add( { name = "3rd left barricade"}, 5, 500 + 64 * 2, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = 5, y = 500 + 64 * 2 }, width = 64, height = 64 })
+    WORLD:add( { name = "4rd left barricade"}, 5, 500 + 64 * 3, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = 5, y = 500 + 64 * 3 }, width = 64, height = 64 })
+    WORLD:add( { name = "5th left barricade"}, 5, 500 + 64 * 4, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = 5, y = 500 + 64 * 4 }, width = 64, height = 64 })
+    WORLD:add( { name = "6th left barricade"}, 5, 500 + 64 * 5, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = 5, y = 500 + 64 * 5 }, width = 64, height = 64 })
 
-    world:add( { name = "1st right barricade"}, screen_values.width * 10 - (5 + 64), 500, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = screen_values.width * 10 - (5 + 64), y = 500 }, width = 64, height = 64 })
-    world:add( { name = "2nd right barricade"}, screen_values.width * 10 - (5 + 64), 500 + 64, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = screen_values.width * 10 - (5 + 64), y = 500 + 64 }, width = 64, height = 64 })
-    world:add( { name = "3rd right barricade"}, screen_values.width * 10 - (5 + 64), 500 + 64 * 2, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = screen_values.width * 10 - (5 + 64), y = 500 + 64 * 2 }, width = 64, height = 64 })
-    world:add( { name = "4rd right barricade"}, screen_values.width * 10 - (5 + 64), 500 + 64 * 3, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = screen_values.width * 10 - (5 + 64), y = 500 + 64 * 3 }, width = 64, height = 64 })
-    world:add( { name = "5th right barricade"}, screen_values.width * 10 - (5 + 64), 500 + 64 * 4, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = screen_values.width * 10 - (5 + 64), y = 500 + 64 * 4 }, width = 64, height = 64 })
-    world:add( { name = "6th right barricade"}, screen_values.width * 10 - (5 + 64), 500 + 64 * 5, 64, 64)
-    table.insert(entities.road.barricades, { position = { x = screen_values.width * 10 - (5 + 64), y = 500 + 64 * 5 }, width = 64, height = 64 })
+    WORLD:add( { name = "1st right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 }, width = 64, height = 64 })
+    WORLD:add( { name = "2nd right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 }, width = 64, height = 64 })
+    WORLD:add( { name = "3rd right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 2, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 2 }, width = 64, height = 64 })
+    WORLD:add( { name = "4rd right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 3, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 3 }, width = 64, height = 64 })
+    WORLD:add( { name = "5th right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 4, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 4 }, width = 64, height = 64 })
+    WORLD:add( { name = "6th right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 5, 64, 64)
+    table.insert(ENTITIES.road.barricades, { position = { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 5 }, width = 64, height = 64 })
 
 end
 
 function love.update(dt)
 
     if love.keyboard.isDown("escape") or 
-        ( has_joysticks and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
+        ( HAS_JOYSTICKS and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
         love.event.quit();
     end
 
-    if not game_over then
+    if not GAME_OVER then
         Score:updateTimer(dt)
         Score:updateScoreCount(dt)
     end
@@ -306,11 +309,11 @@ function love.update(dt)
     Timer.update(dt)
 
     -- For each player update
-    for i, player in ipairs(entities.players) do
+    for i, player in ipairs(ENTITIES.players) do
 
-        if not game_over then
+        if not GAME_OVER then
             --check if game is over
-            game_over = not (game_over or player:isAlive())
+            GAME_OVER = not (GAME_OVER or player:isAlive())
         end
 
         player.animation:update(dt)
@@ -320,8 +323,8 @@ function love.update(dt)
 
             if not punch and not kick and player.attackTimer < love.timer.getTime() then
                 player:move(
-                    player.movement_speed * game_speed * x * dt,
-                    player.movement_speed * game_speed * y * dt
+                    player.movement_speed * GAME_SPEED * x * dt,
+                    player.movement_speed * GAME_SPEED * y * dt
                 )
             end
 
@@ -354,16 +357,16 @@ function love.update(dt)
 
     end
 
-    if game_over then
-        gameoverColors.G = math.max(gameoverColors.G - dt * 148, 0)
-        gameoverColors.B = math.max(gameoverColors.B - dt * 148, 0)
+    if GAME_OVER then
+        GAMEOVER_COLORS.G = math.max(GAMEOVER_COLORS.G - dt * 148, 0)
+        GAMEOVER_COLORS.B = math.max(GAMEOVER_COLORS.B - dt * 148, 0)
     end
 
     AI:update(dt, Score, Timer)
 end
 
 function love.draw()
-    love.graphics.scale(h_scale, v_scale)
+    love.graphics.scale(H_SCALE, V_SCALE)
 
     Score:drawTimer()
     Score:drawScoreCount()
@@ -373,11 +376,11 @@ function love.draw()
     if (locked_camera) then
 
     else
-        x_offset = (entities.players[1].position.x - (screen_values.width / 4))
-        y_offset = screen_values.height / 2
+        x_offset = (ENTITIES.players[1].position.x - (SCREEN_VALUES.width / 4))
+        y_offset = SCREEN_VALUES.height / 2
 
-        camera_rectangle.position.x = x_offset
-        camera_rectangle.position.y = y_offset
+        CAMERA_RECTANGLE.position.x = x_offset
+        CAMERA_RECTANGLE.position.y = y_offset
 
         love.graphics.translate(-x_offset, -y_offset)
     end
@@ -387,143 +390,143 @@ function love.draw()
 
     --Draw top of planks
 
-    for i = 1, #entities.road.planks_top do
-        local pands = entities.road.planks_top[i]
-        if check_collision(pands, camera_rectangle) then
-            love.graphics.draw(street, plank_top, pands.position.x, pands.position.y)
+    for i = 1, #ENTITIES.road.planks_top do
+        local pands = ENTITIES.road.planks_top[i]
+        if check_collision(pands, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, PLANK_TOP, pands.position.x, pands.position.y)
         end
     end
 
     -- planks
-    for i = 1, #entities.road.planks do
-        local pands = entities.road.planks[i]
-        if check_collision(pands, camera_rectangle) then
-            love.graphics.draw(street, plank, pands.position.x, pands.position.y)
+    for i = 1, #ENTITIES.road.planks do
+        local pands = ENTITIES.road.planks[i]
+        if check_collision(pands, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, PLANK, pands.position.x, pands.position.y)
         end
     end
 
-    -- Draw plank and sidewalk combo
-    for i = 1, #entities.road.plank_and_sidewalk do
-        local pands = entities.road.plank_and_sidewalk[i]
-        if check_collision(pands, camera_rectangle) then
-            love.graphics.draw(street, plank_and_sidewalk, pands.position.x, pands.position.y)
+    -- Draw PLANK and SIDEWALK combo
+    for i = 1, #ENTITIES.road.PLANK_AND_SIDEWALK do
+        local pands = ENTITIES.road.PLANK_AND_SIDEWALK[i]
+        if check_collision(pands, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, PLANK_AND_SIDEWALK, pands.position.x, pands.position.y)
         end
     end
 
-    for i = 1, #entities.road.sidewalk do
-        local sw = entities.road.sidewalk[i]
-        if check_collision(sw, camera_rectangle) then
-            love.graphics.draw(street, sidewalk, sw.position.x, sw.position.y)
+    for i = 1, #ENTITIES.road.SIDEWALK do
+        local sw = ENTITIES.road.SIDEWALK[i]
+        if check_collision(sw, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, SIDEWALK, sw.position.x, sw.position.y)
         end
     end
 
-    for i = 1, #entities.road.gutter do
-        local g = entities.road.gutter[i]
-        if check_collision(g, camera_rectangle) then
-            love.graphics.draw(street, gutter, g.position.x, g.position.y)
+    for i = 1, #ENTITIES.road.GUTTER do
+        local g = ENTITIES.road.GUTTER[i]
+        if check_collision(g, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, GUTTER, g.position.x, g.position.y)
         end
     end
 
-    -- Draw gutter flipped
+    -- Draw GUTTER flipped
 
-    for i = 1, #entities.road.gutter do
-        local g = entities.road.gutter[i]
-        if check_collision(g, camera_rectangle) then
-            love.graphics.draw(street, gutter, g.position.x + 64, g.position.y + 7 * 64, math.pi)
+    for i = 1, #ENTITIES.road.GUTTER do
+        local g = ENTITIES.road.GUTTER[i]
+        if check_collision(g, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, GUTTER, g.position.x + 64, g.position.y + 7 * 64, math.pi)
         end
     end
 
-    for i = 1, #entities.road.street do
-        local s = entities.road.street[i]
-        if check_collision(s, camera_rectangle) then
-            love.graphics.draw(street, asphalt, s.position.x, s.position.y)
-            love.graphics.draw(street, asphalt, s.position.x, s.position.y + 64)
-            love.graphics.draw(street, asphalt, s.position.x, s.position.y + 64 * 3)
-            love.graphics.draw(street, asphalt, s.position.x, s.position.y + 64 * 4)
+    for i = 1, #ENTITIES.road.STREET do
+        local s = ENTITIES.road.STREET[i]
+        if check_collision(s, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, ASPHALT, s.position.x, s.position.y)
+            love.graphics.draw(STREET, ASPHALT, s.position.x, s.position.y + 64)
+            love.graphics.draw(STREET, ASPHALT, s.position.x, s.position.y + 64 * 3)
+            love.graphics.draw(STREET, ASPHALT, s.position.x, s.position.y + 64 * 4)
         end
     end
 
-    for i = 1, #entities.road.street_lines do
-        local sl = entities.road.street_lines[i]
-        if check_collision(sl, camera_rectangle) then
-            love.graphics.draw(street, street_lines, sl.position.x, sl.position.y)
+    for i = 1, #ENTITIES.road.STREET_LINES do
+        local sl = ENTITIES.road.STREET_LINES[i]
+        if check_collision(sl, CAMERA_RECTANGLE) then
+            love.graphics.draw(STREET, STREET_LINES, sl.position.x, sl.position.y)
         end
     end
 
 
     --- end of background ---
 
-    for i = 1, #entities.road.barricades do
-        local barricade = entities.road.barricades[i]
-        if check_collision(barricade, camera_rectangle) then
-            love.graphics.draw(obstacles, barricade_quad, barricade.position.x, barricade.position.y)
+    for i = 1, #ENTITIES.road.barricades do
+        local barricade = ENTITIES.road.barricades[i]
+        if check_collision(barricade, CAMERA_RECTANGLE) then
+            love.graphics.draw(OBSTACLES, BARRICADE_QUAD, barricade.position.x, barricade.position.y)
         end
     end
 
-    for i = 1, #entities.enemies do
-        local enemy = entities.enemies[i]
-        if check_collision(enemy, camera_rectangle) then
+    for i = 1, #ENTITIES.enemies do
+        local enemy = ENTITIES.enemies[i]
+        if check_collision(enemy, CAMERA_RECTANGLE) then
             local x, y = enemy:getBboxPosition()
             enemy.animation:draw(enemy.image, x, y, 0, 1, 1)
         end
     end
 
     
-    for i = 1, #entities.players do
-        local player = entities.players[i]
+    for i = 1, #ENTITIES.players do
+        local player = ENTITIES.players[i]
         local x, y = player:getBboxPosition()
         player.animation:draw(player.image, x, y, 0, 1, 1)
     end
 
-    if game_over then
+    if GAME_OVER then
 
         local old_f = love.graphics.getFont()
-        love.graphics.setColor(255, gameoverColors.G, gameoverColors.B, 255)
+        love.graphics.setColor(255, GAMEOVER_COLORS.G, GAMEOVER_COLORS.B, 255)
         local f = love.graphics.newFont("Assets/PressStart2P.ttf", 75)
         love.graphics.setFont(f)
 
         local text_length = f:getWidth("Game Over")
-        local position = { x = camera_rectangle.width / 2 - text_length, y = camera_rectangle.height / 2 - 75 }
+        local position = { x = CAMERA_RECTANGLE.width / 2 - text_length, y = CAMERA_RECTANGLE.height / 2 - 75 }
 
         love.graphics.print("Game Over", position.x, position.y)
 
         love.graphics.setFont(old_f)
 
         --[[Timer.after(3, function()
-            love.graphics.printf("Game Over", 20, 11 * debug_font_size, 1000, "left")
+            love.graphics.printf("Game Over", 20, 11 * DEBUG_FONT_SIZE, 1000, "left")
         end);]]
     end
 
-    if debug then
+    if DEBUG then
         love.graphics.translate(x_offset, y_offset)
-        debug_info()
+        DEBUG_info()
         love.graphics.translate(-x_offset, -y_offset)
         draw_debuxes()
-        love.graphics.rectangle("fill", 5, 0, 1, screen_values.height)
-        love.graphics.rectangle("fill", 5, screen_values.height * (2/5), screen_values.width * 10, 1)
-        love.graphics.rectangle("fill", 5, screen_values.height * 0.9, screen_values.width * 10, 1)
-        love.graphics.rectangle("fill", screen_values.width * 10, 0, 1, screen_values.height)
+        love.graphics.rectangle("fill", 5, 0, 1, SCREEN_VALUES.height)
+        love.graphics.rectangle("fill", 5, SCREEN_VALUES.height * (2/5), SCREEN_VALUES.width * 10, 1)
+        love.graphics.rectangle("fill", 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
+        love.graphics.rectangle("fill", SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
 
-        local w, h = entities.players[1]:getBboxDimensions()
+        local w, h = ENTITIES.players[1]:getBboxDimensions()
 
-        love.graphics.rectangle("line", entities.players[1].position.x + detection_zone_width, 0, 1, screen_values.height )
-        love.graphics.rectangle("line", entities.players[1].position.x + w - detection_zone_width, 0, 1, screen_values.height )
+        love.graphics.rectangle("line", ENTITIES.players[1].position.x + DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
+        love.graphics.rectangle("line", ENTITIES.players[1].position.x + w - DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
     end
 end
 
 function love.resize(width, height)
-	h_scale = (width / screen_values.width) * 2
-	v_scale = (height / screen_values.height) * 2 
+	H_SCALE = (width / SCREEN_VALUES.width) * 2
+	V_SCALE = (height / SCREEN_VALUES.height) * 2 
 end
 
 function draw_debuxes()
-    local colItems, len = world:getItems()
+    local colItems, len = WORLD:getItems()
     for i = 1, len do
-        local x,y,w,h = world:getRect(colItems[i])
+        local x,y,w,h = WORLD:getRect(colItems[i])
         love.graphics.rectangle("line", x, y, w, h)
     end
 
-    for index, player in ipairs(entities.players) do
+    for index, player in ipairs(ENTITIES.players) do
         --- bounding box for kicking and punching
         if player.punch_box.isActive then
             love.graphics.rectangle("fill", player.punch_box.x, player.punch_box.y, player.punch_box.width, player.punch_box.height)
@@ -537,7 +540,7 @@ function draw_debuxes()
         end
     end
 
-    for index, enemy in ipairs(entities.enemies) do
+    for index, enemy in ipairs(ENTITIES.enemies) do
         --- bounding box for kicking and punching
         if enemy.punch_box.isActive then
             love.graphics.rectangle("fill", enemy.punch_box.x, enemy.punch_box.y, enemy.punch_box.width, enemy.punch_box.height)
@@ -552,17 +555,17 @@ function draw_debuxes()
     end
 end
 
-function debug_info()
+function DEBUG_info()
 
-    love.graphics.printf("FPS: " .. love.timer.getFPS(), 20, 1 * debug_font_size, 1000, "left" )
-    love.graphics.printf("Player1.x: " .. entities.players[1].position.x, 20, 2 * debug_font_size, 1000, "left" )
-    love.graphics.printf("Player1.y: " .. entities.players[1].position.y, 20, 3 * debug_font_size, 1000, "left" )
-    love.graphics.printf("enemy1.x: " .. entities.enemies[1].position.x, 20, 4 * debug_font_size, 1000, "left" )
-    love.graphics.printf("enemy1.y: " .. entities.enemies[1].position.y, 20, 5 * debug_font_size, 1000, "left" )
-    love.graphics.printf("enemy1 within trigger field? " .. tostring(entities.enemies[1].position.x <= entities.players[1].position.x + detection_zone_width),
-        20, 6 * debug_font_size, 1000, "left")
-    love.graphics.printf("enemy1 triggered? " .. tostring(entities.enemies[1].triggered), 20, 7 * debug_font_size, 1000, "left")
-    love.graphics.printf("Facing left? " .. tostring(entities.players[1]:isFacingLeft()), 20, 8 * debug_font_size, 1000, "left")
-    love.graphics.printf("player health " .. (entities.players[1].health), 20, 9 * debug_font_size, 1000, "left")
-    love.graphics.printf("enemy health " .. (entities.enemies[1].health), 20, 10 * debug_font_size, 1000, "left")
+    love.graphics.printf("FPS: " .. love.timer.getFPS(), 20, 1 * DEBUG_FONT_SIZE, 1000, "left" )
+    love.graphics.printf("Player1.x: " .. ENTITIES.players[1].position.x, 20, 2 * DEBUG_FONT_SIZE, 1000, "left" )
+    love.graphics.printf("Player1.y: " .. ENTITIES.players[1].position.y, 20, 3 * DEBUG_FONT_SIZE, 1000, "left" )
+    love.graphics.printf("enemy1.x: " .. ENTITIES.enemies[1].position.x, 20, 4 * DEBUG_FONT_SIZE, 1000, "left" )
+    love.graphics.printf("enemy1.y: " .. ENTITIES.enemies[1].position.y, 20, 5 * DEBUG_FONT_SIZE, 1000, "left" )
+    love.graphics.printf("enemy1 within trigger field? " .. tostring(ENTITIES.enemies[1].position.x <= ENTITIES.players[1].position.x + DETECTION_ZONE_WIDTH),
+        20, 6 * DEBUG_FONT_SIZE, 1000, "left")
+    love.graphics.printf("enemy1 triggered? " .. tostring(ENTITIES.enemies[1].triggered), 20, 7 * DEBUG_FONT_SIZE, 1000, "left")
+    love.graphics.printf("Facing left? " .. tostring(ENTITIES.players[1]:isFacingLeft()), 20, 8 * DEBUG_FONT_SIZE, 1000, "left")
+    love.graphics.printf("player health " .. (ENTITIES.players[1].health), 20, 9 * DEBUG_FONT_SIZE, 1000, "left")
+    love.graphics.printf("enemy health " .. (ENTITIES.enemies[1].health), 20, 10 * DEBUG_FONT_SIZE, 1000, "left")
 end

@@ -161,8 +161,8 @@ end
 
 function Character:setAniState(state, doClone)
     local name = self:getName()
-    local charAnimations = animationAssets[name]
-    local charImages = imageAssets[name]
+    local charAnimations = ANIMATION_ASSETS[name]
+    local charImages = IMAGE_ASSETS[name]
 
     if doClone then
         self.animation = charAnimations[state]:clone()
@@ -220,8 +220,8 @@ function Character:death()
         self:setKickBox(0, 0, 0, false)
         self:setPunchBox(0, 0, 0, false)
 
-        if world:hasItem(self) then
-            world:remove(self)
+        if WORLD:hasItem(self) then
+            WORLD:remove(self)
         end
     end
 end
@@ -348,7 +348,7 @@ function Character:move(movement_x, movement_y)
 
     local intendedX = self.position.x + movement_x
     local intendedY = self.position.y + movement_y
-    local actualX, actualY, col, len = world:move(self, intendedX, intendedY, characterCollisionFilter)
+    local actualX, actualY, col, len = WORLD:move(self, intendedX, intendedY, characterCollisionFilter)
     self.position.x = actualX; self.position.y = actualY;
 end
 
