@@ -30,23 +30,6 @@ local Character = rectangle:new {
     }
 }
 
-local characterCollisionFilter = function(me, other)
-    local name = me:getName()
-
-    if name == "punk" then
-        if other.name then
-            local other_name = other:getName()
-            if other_name == "punk" or other_name == "heavy" then
-                return "cross"
-            else
-                return "slide"
-            end
-        end
-    end
-
-    return "slide"
-end
-
 
 function Character:newEnemy(x, y, health, movement_speed, attack_damage, width, height)
     local new_enemy = Character:new({
@@ -198,6 +181,94 @@ function Character:newPlayerChar(x, y, movement_speed, attack_damage, id, width,
     return new_player
 end
 
+local function update_as_left(delta_time)
+    local x = 0
+    local y = 0
+    local punch = false
+    local kick = false
+    local jump = false
+    if love.keyboard.isDown("a") then
+        x = x - 1
+    end
+    if love.keyboard.isDown("d") then
+        x = x + 1
+    end
+    if love.keyboard.isDown("w") then
+        y = y - 1
+    end
+    if love.keyboard.isDown("s") then
+        y = y + 1
+    end
+    if love.keyboard.isDown("q") then
+        punch = true
+    end
+    if love.keyboard.isDown("e") then
+        kick = true
+    end
+    return x, y, punch, kick
+end
+
+local function update_as_right(delta_time)
+    local x = 0
+    local y = 0
+    local punch = false
+    local kick = false
+    local jump = false
+    if love.keyboard.isDown("j") then
+        x = x - 1
+    end
+    if love.keyboard.isDown("l") then
+        x = x + 1
+    end
+    if love.keyboard.isDown("i") then
+        y = y - 1
+    end
+    if love.keyboard.isDown("k") then
+        y = y + 1
+    end
+    if love.keyboard.isDown("u") then
+        punch = true
+    end
+    if love.keyboard.isDown("o") then
+        kick = true
+    end
+    return x, y, punch, kick
+end
+
+local function update_as_controller(delta_time, player_id)
+    if love.joystick.getJoystickCount() == 0 then return end
+
+    local joystick = love.joystick.getJoysticks()[player_id]
+    local x = 0
+    local y = 0
+    local punch = false
+    local kick = false
+    local jump = false
+    if joystick:isGamepadDown("dpleft") then
+        x = x - 1
+    elseif math.abs(joystick:getAxis( 1 )) > 0.2 then
+        x = joystick:getAxis( 1 )
+    end
+    if joystick:isGamepadDown("dpright") then
+        x = x + 1
+    end
+    if joystick:isGamepadDown("dpup") then
+        y = y - 1
+    end
+    if joystick:isGamepadDown("dpdown") then
+        y = y + 1
+    elseif math.abs(joystick:getAxis( 2 )) > 0.2 then
+        y = joystick:getAxis( 2 )
+    end
+    if joystick:isGamepadDown("a") then
+        punch = true
+    end
+    if joystick:isGamepadDown("b") then
+        kick = true
+    end
+    return x, y, punch, kick
+end
+
 function Character:updatePlayer(delta_time)
     if (enums.control_schemes.left_control_scheme == self.control_scheme) then
         return update_as_left()
@@ -294,7 +365,6 @@ function Character:idle()
 end
 
 function Character:kick(timer)
-    local name = self:getName()
 
     if self.punching or self.effects.stunned then return end
 
@@ -321,7 +391,7 @@ function Character:kick(timer)
     end
 end
 
-local characterCollisionFilter = function(me, other)
+local function characterCollisionFilter(me, other)
     local name = me:getName()
 
     if name == "punk" or name == "heavy" then
@@ -375,93 +445,6 @@ function Character:handleAttackBoxes()
     end
 end
 
-function update_as_left(delta_time)
-    local x = 0
-    local y = 0
-    local punch = false
-    local kick = false
-    local jump = false
-    if love.keyboard.isDown("a") then
-        x = x - 1
-    end
-    if love.keyboard.isDown("d") then
-        x = x + 1
-    end
-    if love.keyboard.isDown("w") then
-        y = y - 1
-    end
-    if love.keyboard.isDown("s") then
-        y = y + 1
-    end
-    if love.keyboard.isDown("q") then
-        punch = true
-    end
-    if love.keyboard.isDown("e") then
-        kick = true
-    end
-    return x, y, punch, kick
-end
-
-function update_as_right(delta_time)
-    local x = 0
-    local y = 0
-    local punch = false
-    local kick = false
-    local jump = false
-    if love.keyboard.isDown("j") then
-        x = x - 1
-    end
-    if love.keyboard.isDown("l") then
-        x = x + 1
-    end
-    if love.keyboard.isDown("i") then
-        y = y - 1
-    end
-    if love.keyboard.isDown("k") then
-        y = y + 1
-    end
-    if love.keyboard.isDown("u") then
-        punch = true
-    end
-    if love.keyboard.isDown("o") then
-        kick = true
-    end
-    return x, y, punch, kick
-end
-
-function update_as_controller(delta_time, player_id)
-    if love.joystick.getJoystickCount() == 0 then return end
-
-    local joystick = love.joystick.getJoysticks()[player_id]
-    local x = 0
-    local y = 0
-    local punch = false
-    local kick = false
-    local jump = false
-    if joystick:isGamepadDown("dpleft") then
-        x = x - 1
-    elseif math.abs(joystick:getAxis( 1 )) > 0.2 then
-        x = joystick:getAxis( 1 )
-    end
-    if joystick:isGamepadDown("dpright") then
-        x = x + 1
-    end
-    if joystick:isGamepadDown("dpup") then
-        y = y - 1
-    end
-    if joystick:isGamepadDown("dpdown") then
-        y = y + 1
-    elseif math.abs(joystick:getAxis( 2 )) > 0.2 then
-        y = joystick:getAxis( 2 )
-    end
-    if joystick:isGamepadDown("a") then
-        punch = true
-    end
-    if joystick:isGamepadDown("b") then
-        kick = true
-    end
-    return x, y, punch, kick
-end
 
 --[[
     check if the self character's punch and kick boxes collide with the otherCharacter's bbox.

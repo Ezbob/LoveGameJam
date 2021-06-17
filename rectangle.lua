@@ -52,4 +52,8 @@ function Rectangle:setDimensions(width, height)
   self.height = height
 end
 
+function Rectangle:draw(style)
+  love.graphics.rectangle(style or "line", self.x, self.y, self.width, self.height)
+end
+
 return Rectangle

@@ -6,6 +6,7 @@ local Rectangle = require "rectangle"
 local AI = require "ai"
 local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
+local inspect = require "modules.inspect.inspect"
 
 IN_FOCUS = false
 DEBUG = true
@@ -331,7 +332,7 @@ function love.update(dt)
         player.animation:update(dt)
 
         if player:isAlive() then
-            x, y, punch, kick = player:updatePlayer()
+            local x, y, punch, kick = player:updatePlayer()
 
             if not punch and not kick and player.attackTimer < love.timer.getTime() then
                 player:move(
@@ -562,6 +563,7 @@ function draw_debuxes()
             love.graphics.rectangle("fill", enemy.kick_box.x, enemy.kick_box.y, enemy.kick_box.width, enemy.kick_box.height)
         else
             love.graphics.rectangle("line", enemy.kick_box.x, enemy.kick_box.y, enemy.kick_box.width, enemy.kick_box.height)
+            --enemy.kick_box:draw()
         end
     end
 end
