@@ -5,8 +5,7 @@ local Character = require "character"
 local Rectangle = require "rectangle"
 local AI = require "ai"
 local Timer = require "./modules/hump/timer"
-
-require "scoring"
+local Score = require "scoring"
 
 IN_FOCUS = false
 DEBUG = true

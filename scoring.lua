@@ -1,5 +1,4 @@
-
-Score = {
+local Score = {
 	timer = {
 		font_size = 26,
 		countType = 'up',
@@ -146,3 +145,5 @@ function Score:drawMultiplier()
 		self.score_count.multiplier.position.y, self.score_count.overflow_limit, self.score_count.text_align)
 	love.graphics.setFont(old_font)
 end
+
+return Score
