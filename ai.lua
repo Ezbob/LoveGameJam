@@ -1,5 +1,5 @@
 local rectangle = require "rectangle"
-AI = {
+local AI = {
 	enemy_dead_zone_y = 15,
 	enemy_dead_zone_x = 15
 }
@@ -125,3 +125,5 @@ function AI:update(dt, scoreTable, timer)
 		end
 	end
 end
+
+return AI

@@ -1,6 +1,6 @@
 local enums = require "enums"
 local rectangle = require("rectangle")
-require "position"
+local Timer = require "./modules/hump/timer"
 
 local HitBox = rectangle:new {
     isActive = false,

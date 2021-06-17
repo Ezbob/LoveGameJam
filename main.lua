@@ -3,15 +3,18 @@ local bump = require "./modules/bump/bump"
 local anim8 = require "./modules/anim8/anim8"
 local Character = require "character"
 local Rectangle = require "rectangle"
-Timer = require "./modules/hump/timer"
-require "character"
+local AI = require "ai"
+local Timer = require "./modules/hump/timer"
 require "helper_functions"
-require "ai"
+
 require "scoring"
 
 IN_FOCUS = false
 DEBUG = true
-SCREEN_VALUES = { width = 1600, height = 960 }
+SCREEN_VALUES = {
+    width = 1600,
+    height = 960
+}
 GAME_SPEED = 1
 DETECTION_ZONE_WIDTH = 200
 DEBUG_FONT_SIZE = 16
