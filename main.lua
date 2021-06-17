@@ -308,7 +308,7 @@ end
 
 function love.update(dt)
 
-    if love.keyboard.isDown("escape") or 
+    if love.keyboard.isDown("escape") or
         ( HAS_JOYSTICKS and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
         love.event.quit();
     end

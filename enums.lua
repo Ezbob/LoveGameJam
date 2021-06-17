@@ -5,10 +5,10 @@ return {
         controller = 2
     },
     animation_states = {
-    	idle = 'idle',
-    	walk = 'walk',
-    	punch = 'punch',
-    	kick = 'kick',
-    	death = 'death'
-	}
+        idle = 'idle',
+        walk = 'walk',
+        punch = 'punch',
+        kick = 'kick',
+        death = 'death'
+    }
 }

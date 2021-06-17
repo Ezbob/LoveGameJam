@@ -69,7 +69,7 @@ function Character:setBboxDimensions(width, height, offsets)
     end
 
     if width ~= nil then
-        self.bbox.width = width 
+        self.bbox.width = width
     end
     if width ~= nil then
         self.bbox.height = height
@@ -142,7 +142,7 @@ end
 function Character:getName()
     if self.kind == "player" then
         return string.format(self.kind .. "%i", self.id)
-    end 
+    end
     return self.kind
 end
 
@@ -234,7 +234,7 @@ function Character:punch(timer)
         timer.after(self.punch_delay, function()
             self.punch_box.isActive = true
         end)
-        timer.after(self.punch_delay + 0.3, function()         
+        timer.after(self.punch_delay + 0.3, function()
             self.punching = false
         end)
         self.punching = true
@@ -252,7 +252,7 @@ function Character:stun(knockbackDist)
             self.punch_box.isActive = false
             self.punching = false
         end
-        
+
         self.effects.stunned = true
 
         Timer.after(0.6, function()
@@ -312,9 +312,9 @@ function Character:kick(timer)
         self.attackTimer = love.timer.getTime() + 0.5
         self.animation:gotoFrame(1)
         timer.after(self.punch_delay, function()
-            self.kick_box.isActive = true    
+            self.kick_box.isActive = true
         end)
-        timer.after(self.punch_delay + 0.4, function()         
+        timer.after(self.punch_delay + 0.4, function()
             self.kicking = false
         end)
         self.kicking = true
@@ -350,25 +350,25 @@ end
 
 function Character:handleAttackBoxes()
     local w, h = self:getBboxDimensions()
-    local pb_right_edge, kb_right_edge 
+    local pb_right_edge, kb_right_edge
 
     if self:isFacingLeft() then
         pb_right_edge = math.abs( self.punch_box.width - w ) -- because the kick/punch box isn't as wide as the person bbox
         kb_right_edge = math.abs( self.kick_box.width - w )
-        self.punch_box.x = self.x - w + pb_right_edge; 
-        self.punch_box.y = self.y + self.punch_box.charYOffset; 
+        self.punch_box.x = self.x - w + pb_right_edge;
+        self.punch_box.y = self.y + self.punch_box.charYOffset;
 
-        self.kick_box.x = self.x - w + kb_right_edge;  
-        self.kick_box.y = self.y + self.kick_box.charYOffset; 
+        self.kick_box.x = self.x - w + kb_right_edge;
+        self.kick_box.y = self.y + self.kick_box.charYOffset;
 
     elseif not self:isFacingLeft() then
-        self.punch_box.x = self.x + w  
-        self.punch_box.y = self.y + self.punch_box.charYOffset; 
+        self.punch_box.x = self.x + w
+        self.punch_box.y = self.y + self.punch_box.charYOffset;
 
-        self.kick_box.x = self.x + w; 
+        self.kick_box.x = self.x + w;
         self.kick_box.y = self.y + self.kick_box.charYOffset;
     end
-    
+
     if self.attackTimer < love.timer.getTime() then
         self.kick_box.isActive = false
         self.punch_box.isActive = false
@@ -440,7 +440,7 @@ function update_as_controller(delta_time, player_id)
     local jump = false
     if joystick:isGamepadDown("dpleft") then
         x = x - 1
-    elseif math.abs(joystick:getAxis( 1 )) > 0.2 then 
+    elseif math.abs(joystick:getAxis( 1 )) > 0.2 then
         x = joystick:getAxis( 1 )
     end
     if joystick:isGamepadDown("dpright") then
@@ -451,7 +451,7 @@ function update_as_controller(delta_time, player_id)
     end
     if joystick:isGamepadDown("dpdown") then
         y = y + 1
-    elseif math.abs(joystick:getAxis( 2 )) > 0.2 then 
+    elseif math.abs(joystick:getAxis( 2 )) > 0.2 then
         y = joystick:getAxis( 2 )
     end
     if joystick:isGamepadDown("a") then
@@ -465,7 +465,7 @@ end
 
 --[[
     check if the self character's punch and kick boxes collide with the otherCharacter's bbox.
-    Takes a optional callback wherein the hit reaction can be expressed using the two characters as arguments 
+    Takes a optional callback wherein the hit reaction can be expressed using the two characters as arguments
 ]]
 function Character:checkCollision(otherCharacter, onPunchCallback, onKickCallback)
     if self.punch_box.isActive then
@@ -479,9 +479,9 @@ function Character:checkCollision(otherCharacter, onPunchCallback, onKickCallbac
             else
                 if self:isFacingLeft() then
                     otherCharacter:move(-100, 0)
-                else 
+                else
                     otherCharacter:move(100, 0)
-                end 
+                end
             end
         end
     end
@@ -489,7 +489,7 @@ function Character:checkCollision(otherCharacter, onPunchCallback, onKickCallbac
     if self.kick_box.isActive then
 
         if self.kick_box:isIntersectingRectangles(otherCharacter) then
-            
+
             --scoreTable:pushScore(200)
 
             if onKickCallback ~= nil then
@@ -497,9 +497,9 @@ function Character:checkCollision(otherCharacter, onPunchCallback, onKickCallbac
             else
                 if self:isFacingLeft() then
                     otherCharacter:move(-300, 0)
-                else 
+                else
                     otherCharacter:move(300, 0)
-                end 
+                end
             end
         end
     end
