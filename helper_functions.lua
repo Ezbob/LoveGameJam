@@ -1,13 +1,13 @@
 function check_collision(self, other)
-	local self_left = self.position.x
-    local self_right = self.position.x + self.width
-    local self_top = self.position.y
-    local self_bottom = self.position.y + self.height
+	local self_left = self.x
+    local self_right = self.x + self.width
+    local self_top = self.y
+    local self_bottom = self.y + self.height
 
-    local other_left = other.position.x
-    local other_right = other.position.x + other.width
-    local other_top = other.position.y
-    local other_bottom = other.position.y + other.height
+    local other_left = other.x
+    local other_right = other.x + other.width
+    local other_top = other.y
+    local other_bottom = other.y + other.height
 
     if self_right >= other_left and
     self_left <= other_right and

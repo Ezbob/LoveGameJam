@@ -1,7 +1,34 @@
 local enums = require "enums"
+local rectangle = require("rectangle")
 require "position"
 
-Character = {}
+local HitBox = rectangle:new {
+    isActive = false,
+    charYOffset = 0
+}
+
+local Character = rectangle:new {
+    health = 100,
+    movement_speed = 0,
+    attack_damage = 0,
+    attackTimer = 0,
+    animationState = nil,
+    effects = {
+        stunned = false
+    },
+    bbox = {
+        width = 0,
+        height = 0,
+        offsets_x = 0,
+        offsets_y = 0
+    },
+    punch_box = HitBox:new {
+        charYOffset = 14
+    },
+    kick_box = HitBox:new {
+        charYOffset = 30
+    }
+}
 
 local characterCollisionFilter = function(me, other)
     local name = me:getName()
@@ -20,48 +47,17 @@ local characterCollisionFilter = function(me, other)
     return "slide"
 end
 
-function Character:newCharacter(x, y, health, movement_speed, attack_damage, width, height)
-    local new_character = {
-        position = Position:newPosition(x, y),
+
+function Character:newEnemy(x, y, health, movement_speed, attack_damage, width, height)
+    local new_enemy = Character:new({
+        x = x,
+        y = y,
         health = health,
         movement_speed = movement_speed,
         attack_damage = attack_damage,
         width = width,
-        height = height,
-        attackTimer = 0,
-        animationState = nil,
-        effects = {
-            stunned = false
-        },
-        bbox = { 
-            width = 0, 
-            height = 0, 
-            offsets_x = 0, 
-            offsets_y = 0 
-        },
-        punch_box = {
-            x = 0,
-            y = 0,
-            width = 0,
-            height = 0,
-            charYOffset = 14, 
-            isActive = false
-        },
-        kick_box = {
-            x = 0,
-            y = 0,
-            width = 0,
-            height = 0,
-            charYOffset = 30, 
-            isActive = false
-        }
-    }
-    self.__index = self
-    return setmetatable(new_character, self)
-end
-
-function Character:newEnemy(x, y, health, movement_speed, attack_damage, width, height)
-    local new_enemy = Character:newCharacter(x, y, health, movement_speed, attack_damage, width, height)
+        height = height
+    })
     new_enemy.triggered = false
     return new_enemy
 end
@@ -73,7 +69,7 @@ function Character:setBboxDimensions(width, height, offsets)
     end
 
     if width ~= nil then
-        self.bbox.width = width        
+        self.bbox.width = width 
     end
     if width ~= nil then
         self.bbox.height = height
@@ -81,12 +77,8 @@ function Character:setBboxDimensions(width, height, offsets)
 end
 
 function Character:setKickBox(width, height, bodyYOffset, isActive)
-    if width ~= nil then
-        self.kick_box.width = width
-    end
-    if height ~= nil then
-        self.kick_box.height = height
-    end
+    self.kick_box:setDimensions(width, height)
+
     if bodyYOffset ~= nil then
         self.kick_box.charYOffset = bodyYOffset
     end
@@ -96,12 +88,8 @@ function Character:setKickBox(width, height, bodyYOffset, isActive)
 end
 
 function Character:setPunchBox(width, height, bodyYOffset, isActive)
-    if width ~= nil then
-        self.punch_box.width = width
-    end
-    if height ~= nil then
-        self.punch_box.height = height
-    end
+    self.punch_box:setDimensions(width, height)
+
     if bodyYOffset ~= nil then
         self.punch_box.charYOffset = bodyYOffset
     end
@@ -119,7 +107,7 @@ function Character:getBboxDimensions()
 end
 
 function Character:getBboxPosition()
-    return self.position.x - self.bbox.offsets_x, self.position.y - self.bbox.offsets_y
+    return self.x - self.bbox.offsets_x, self.y - self.bbox.offsets_y
 end
 
 
@@ -192,7 +180,15 @@ function Character:getAniState()
 end
 
 function Character:newPlayerChar(x, y, movement_speed, attack_damage, id, width, height)
-    local new_player = Character:newCharacter(x, y, 100, movement_speed, attack_damage, width, height)
+    local new_player = Character:new {
+        x = x,
+        y = y,
+        health = 100,
+        movement_speed = movement_speed,
+        attack_damage = attack_damage,
+        width = width,
+        height = height
+    }
     new_player.control_scheme = enums.control_schemes.left_control_scheme
     new_player.punching = false; new_player.kicking = false;
     new_player.kind = "player"
@@ -265,9 +261,9 @@ function Character:stun(knockbackDist)
 
         if knockbackDist then
             if self:isFacingLeft() then
-                self.position.x = self.position.x + knockbackDist
+                self.x = self.x + knockbackDist
             else
-                self.position.x = self.position.x - knockbackDist
+                self.x = self.x - knockbackDist
             end
         end
     end
@@ -345,10 +341,11 @@ end
 function Character:move(movement_x, movement_y)
     if self.effects.stunned then return end
 
-    local intendedX = self.position.x + movement_x
-    local intendedY = self.position.y + movement_y
+    local intendedX = self.x + movement_x
+    local intendedY = self.y + movement_y
     local actualX, actualY, col, len = WORLD:move(self, intendedX, intendedY, characterCollisionFilter)
-    self.position.x = actualX; self.position.y = actualY;
+    self.x = actualX
+    self.y = actualY
 end
 
 function Character:handleAttackBoxes()
@@ -358,18 +355,18 @@ function Character:handleAttackBoxes()
     if self:isFacingLeft() then
         pb_right_edge = math.abs( self.punch_box.width - w ) -- because the kick/punch box isn't as wide as the person bbox
         kb_right_edge = math.abs( self.kick_box.width - w )
-        self.punch_box.x = self.position.x - w + pb_right_edge; 
-        self.punch_box.y = self.position.y + self.punch_box.charYOffset; 
+        self.punch_box.x = self.x - w + pb_right_edge; 
+        self.punch_box.y = self.y + self.punch_box.charYOffset; 
 
-        self.kick_box.x = self.position.x - w + kb_right_edge;  
-        self.kick_box.y = self.position.y + self.kick_box.charYOffset; 
+        self.kick_box.x = self.x - w + kb_right_edge;  
+        self.kick_box.y = self.y + self.kick_box.charYOffset; 
 
     elseif not self:isFacingLeft() then
-        self.punch_box.x = self.position.x + w  
-        self.punch_box.y = self.position.y + self.punch_box.charYOffset; 
+        self.punch_box.x = self.x + w  
+        self.punch_box.y = self.y + self.punch_box.charYOffset; 
 
-        self.kick_box.x = self.position.x + w; 
-        self.kick_box.y = self.position.y + self.kick_box.charYOffset;
+        self.kick_box.x = self.x + w; 
+        self.kick_box.y = self.y + self.kick_box.charYOffset;
     end
     
     if self.attackTimer < love.timer.getTime() then
@@ -473,14 +470,7 @@ end
 function Character:checkCollision(otherCharacter, onPunchCallback, onKickCallback)
     if self.punch_box.isActive then
 
-        if check_collision({ 
-            position = { 
-                x = self.punch_box.x, 
-                y = self.punch_box.y
-            }, 
-            width = self.punch_box.width, 
-            height = self.punch_box.height
-            }, otherCharacter) then
+        if self.punch_box:isIntersectingRectangles(otherCharacter) then
 
             --scoreTable:pushScore(100)
 
@@ -498,14 +488,7 @@ function Character:checkCollision(otherCharacter, onPunchCallback, onKickCallbac
 
     if self.kick_box.isActive then
 
-        if check_collision({ 
-            position = { 
-                x = self.kick_box.x, 
-                y = self.kick_box.y
-            }, 
-            width = self.kick_box.width, 
-            height = self.kick_box.height
-            }, otherCharacter) then
+        if self.kick_box:isIntersectingRectangles(otherCharacter) then
             
             --scoreTable:pushScore(200)
 
@@ -529,3 +512,5 @@ end
 function Character:isAlive()
     return self.health > 0
 end
+
+return Character

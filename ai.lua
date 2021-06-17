@@ -1,4 +1,4 @@
-
+local rectangle = require "rectangle"
 AI = {
 	enemy_dead_zone_y = 15,
 	enemy_dead_zone_x = 15
@@ -24,8 +24,8 @@ function AI:update(dt, scoreTable, timer)
 			for index, player in ipairs(ENTITIES.players) do
 
 				local w, h = player:getBboxDimensions()
-				local currentEnemyX, currentEnemyY = currentEnemy.position.x, currentEnemy.position.y
-				local playerX, playerY = player.position.x, player.position.y
+				local currentEnemyX, currentEnemyY = currentEnemy:getPosition()
+				local playerX, playerY = player:getPosition()
 
 				if currentEnemyX <= playerX + DETECTION_ZONE_WIDTH and
 					currentEnemyX >= playerX + w - DETECTION_ZONE_WIDTH and player:isAlive() then
