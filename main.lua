@@ -5,7 +5,6 @@ local Character = require "character"
 local Rectangle = require "rectangle"
 local AI = require "ai"
 local Timer = require "./modules/hump/timer"
-require "helper_functions"
 
 require "scoring"
 
@@ -406,7 +405,7 @@ function love.draw()
 
     for i = 1, #ENTITIES.road.planks_top do
         local pands = ENTITIES.road.planks_top[i]
-        if check_collision(pands, CAMERA_RECTANGLE) then
+        if pands:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, PLANK_TOP, pands.x, pands.y)
         end
     end
@@ -414,7 +413,7 @@ function love.draw()
     -- planks
     for i = 1, #ENTITIES.road.planks do
         local pands = ENTITIES.road.planks[i]
-        if check_collision(pands, CAMERA_RECTANGLE) then
+        if pands:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, PLANK, pands.x, pands.y)
         end
     end
@@ -422,21 +421,21 @@ function love.draw()
     -- Draw PLANK and SIDEWALK combo
     for i = 1, #ENTITIES.road.PLANK_AND_SIDEWALK do
         local pands = ENTITIES.road.PLANK_AND_SIDEWALK[i]
-        if check_collision(pands, CAMERA_RECTANGLE) then
+        if pands:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, PLANK_AND_SIDEWALK, pands.x, pands.y)
         end
     end
 
     for i = 1, #ENTITIES.road.SIDEWALK do
         local sw = ENTITIES.road.SIDEWALK[i]
-        if check_collision(sw, CAMERA_RECTANGLE) then
+        if sw:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, SIDEWALK, sw.x, sw.y)
         end
     end
 
     for i = 1, #ENTITIES.road.GUTTER do
         local g = ENTITIES.road.GUTTER[i]
-        if check_collision(g, CAMERA_RECTANGLE) then
+        if g:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, GUTTER, g.x, g.y)
         end
     end
@@ -445,14 +444,14 @@ function love.draw()
 
     for i = 1, #ENTITIES.road.GUTTER do
         local g = ENTITIES.road.GUTTER[i]
-        if check_collision(g, CAMERA_RECTANGLE) then
+        if g:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, GUTTER, g.x + 64, g.y + 7 * 64, math.pi)
         end
     end
 
     for i = 1, #ENTITIES.road.STREET do
         local s = ENTITIES.road.STREET[i]
-        if check_collision(s, CAMERA_RECTANGLE) then
+        if s:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, ASPHALT, s.x, s.y)
             love.graphics.draw(STREET, ASPHALT, s.x, s.y + 64)
             love.graphics.draw(STREET, ASPHALT, s.x, s.y + 64 * 3)
@@ -462,7 +461,7 @@ function love.draw()
 
     for i = 1, #ENTITIES.road.STREET_LINES do
         local sl = ENTITIES.road.STREET_LINES[i]
-        if check_collision(sl, CAMERA_RECTANGLE) then
+        if sl:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(STREET, STREET_LINES, sl.x, sl.y)
         end
     end
@@ -472,14 +471,14 @@ function love.draw()
 
     for i = 1, #ENTITIES.road.barricades do
         local barricade = ENTITIES.road.barricades[i]
-        if check_collision(barricade, CAMERA_RECTANGLE) then
+        if barricade:isIntersectingRectangles(CAMERA_RECTANGLE) then
             love.graphics.draw(OBSTACLES, BARRICADE_QUAD, barricade.x, barricade.y)
         end
     end
 
     for i = 1, #ENTITIES.enemies do
         local enemy = ENTITIES.enemies[i]
-        if check_collision(enemy, CAMERA_RECTANGLE) then
+        if enemy:isIntersectingRectangles(CAMERA_RECTANGLE) then
             local x, y = enemy:getBboxPosition()
             enemy.animation:draw(enemy.image, x, y, 0, 1, 1)
         end
