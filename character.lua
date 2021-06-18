@@ -1,6 +1,7 @@
 local enums = require "enums"
 local rectangle = require("rectangle")
 local Timer = require "./modules/hump/timer"
+local inspect = require "modules.inspect.inspect"
 
 local HitBox = rectangle:new {
     isActive = false,
@@ -93,24 +94,6 @@ function Character:getBboxPosition()
     return self.x - self.bbox.offsets_x, self.y - self.bbox.offsets_y
 end
 
-
-function new_punk(x, y, width, height)
-    local char = Character:newEnemy(x, y, 50, 200, 10, width, height)
-    char.kind = "punk"
-    char:setAniState(enums.animation_states.idle)
-    char.kick_delay = 0.4
-    char.punch_delay = 0.24
-    return char
-end
-
-function new_heavy(x, y, width, height)
-    local char = Character:newEnemy(x, y, 50, 5, 10, width, height)
-    char.kind = "heavy"
-    char.kick_delay = 0.45
-    char.punch_delay = 0.27
-    return char
-end
-
 function Character:Update()
     if not self.trigged then return end;
 
@@ -163,22 +146,22 @@ function Character:getAniState()
 end
 
 function Character:newPlayerChar(x, y, movement_speed, attack_damage, id, width, height)
-    local new_player = Character:new {
+    return Character:new {
         x = x,
         y = y,
         health = 100,
         movement_speed = movement_speed,
         attack_damage = attack_damage,
         width = width,
-        height = height
+        height = height,
+        control_scheme = enums.control_schemes.left_control_scheme,
+        punching = false,
+        kicking = false,
+        kind = "player",
+        id = id,
+        kick_delay = 0.4,
+        punch_delay = 0.24
     }
-    new_player.control_scheme = enums.control_schemes.left_control_scheme
-    new_player.punching = false; new_player.kicking = false;
-    new_player.kind = "player"
-    new_player.id = id
-    new_player.kick_delay = 0.4
-    new_player.punch_delay = 0.24
-    return new_player
 end
 
 local function update_as_left(delta_time)
@@ -425,12 +408,11 @@ function Character:handleAttackBoxes()
     if self:isFacingLeft() then
         pb_right_edge = math.abs( self.punch_box.width - w ) -- because the kick/punch box isn't as wide as the person bbox
         kb_right_edge = math.abs( self.kick_box.width - w )
-        self.punch_box.x = self.x - w + pb_right_edge;
-        self.punch_box.y = self.y + self.punch_box.charYOffset;
 
-        self.kick_box.x = self.x - w + kb_right_edge;
-        self.kick_box.y = self.y + self.kick_box.charYOffset;
+        self.punch_box:setPosition(self.x - w + pb_right_edge, self.y + self.punch_box.charYOffset)
+        self.kick_box:setPosition(self.x - w + kb_right_edge, self.y + self.kick_box.charYOffset)
 
+        print(self.punch_box.x, self.punch_box.y)
     elseif not self:isFacingLeft() then
         self.punch_box.x = self.x + w
         self.punch_box.y = self.y + self.punch_box.charYOffset;

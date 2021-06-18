@@ -4,13 +4,19 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "'build' and run",
+            "label": "run it",
             "type": "shell",
-            "command": "love ${workspaceFolder}",
+            "command": "lovec ${workspaceFolder}",
+            "problemMatcher": [],
             "group": {
                 "kind": "build",
                 "isDefault": true
             }
+        },
+        {
+            "label": "test it",
+            "type": "shell",
+            "command": "lua53 ${workspaceFolder}/test.lua"
         }
     ]
 }

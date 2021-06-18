@@ -1,12 +1,17 @@
+if DEBUG then
+    io.stdout:setvbuf('no')
+end
 local enums = require "enums"
 local bump = require "./modules/bump/bump"
-local anim8 = require "./modules/anim8/anim8"
 local Character = require "character"
 local Rectangle = require "rectangle"
 local AI = require "ai"
 local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
+local Camera = require "camera"
+local Char = require "char.Char"
+local Animation = require "char.Animation"
 
 IN_FOCUS = false
 DEBUG = true
@@ -60,33 +65,48 @@ ENTITIES = {
     background = {}
 }
 
-CAMERA_RECTANGLE = {
-    position = {
-        x = 0,
-        y = 0
-    },
+CAMERA_RECTANGLE = Camera:new {
+    x = 0,
+    y = 0,
     width = SCREEN_VALUES.width,
     height = SCREEN_VALUES.height
 }
 
 FONT = nil
 
-
 function love.focus(focus)
     IN_FOCUS = focus
 end
 
-function love.load(arg)
-
+function love.load()
     -- Load Textures
     FONT = love.graphics.newFont("Assets/PressStart2P.ttf", DEBUG_FONT_SIZE)
     love.graphics.setFont(FONT)
     WORLD = bump.newWorld()
     IMAGES = {}
 
+
+    local p1 = Char:new {
+        width = 76,
+        height = 104,
+        animations = {}
+    }
+
+    p1.animations.idle = Animation:new(love.graphics.newImage("Assets/miniplayer_idle.png"), p1, {'1-4', 1}, 0.25)
+    p1.animations.walk = Animation:new(love.graphics.newImage("Assets/miniplayer_walk.png"), p1, {'1-4', 1}, 0.1)
+    p1.animations.punch = Animation:new(love.graphics.newImage("Assets/miniplayer_punch.png"), p1, {'1-4', 1}, 0.1)
+    p1.animations.kick = Animation:new(love.graphics.newImage("Assets/miniplayer_kick.png"), p1, {'1-4', 1}, 0.1)
+    p1.animations.death = Animation:new(love.graphics.newImage("Assets/miniplayer_death.png"), {width = 64, height = 104}, {'1-4', 1}, 0.1, "pauseAtEnd")
+
+
+    table.insert(ENTITIES.players, p1)
+
+    --[[
     STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
 
-    local player1 = Character:newPlayerChar(100, SCREEN_VALUES.height * 0.7, 200, 10, 1, STD_CHR_WIDTH, STD_CHR_HEIGHT)
+    local player1 = Character:newPlayerChar(
+        100, SCREEN_VALUES.height * 0.7,
+        200, 10, 1, STD_CHR_WIDTH, STD_CHR_HEIGHT)
 
     local torso_spacing = 25
     local head_room = 58
@@ -109,6 +129,7 @@ function love.load(arg)
 
     Score:setupTimer(0)
     Score:setupScoreCount(0)
+--]]
 
     IMAGE_ASSETS = {
         player1 = {
@@ -135,9 +156,7 @@ function love.load(arg)
         }
     }
 
-
-    local char = IMAGE_ASSETS['player1']
-    local h = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.idle:getWidth(), char.idle:getHeight())
+    --[[
     local j = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.punch:getWidth(), char.punch:getHeight())
     local k = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.walk:getWidth(), char.walk:getHeight())
     local l = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.kick:getWidth(), char.kick:getHeight())
@@ -182,13 +201,15 @@ function love.load(arg)
             walk = anim8.newAnimation(ehw('1-4', 1), 0.1)
         }
     }
+
+
     -- Init map
     CARS = love.graphics.newImage("Assets/CARS.png")
     GREEN_CAR = love.graphics.newQuad(0, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
     YELLOW_CAR = love.graphics.newQuad(128, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
     RED_CAR = love.graphics.newQuad(256, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
     BLUE_CAR = love.graphics.newQuad(256 + 128, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
-
+]]--
     OBSTACLES = love.graphics.newImage("Assets/obstacles_small.png")
     STANDING_BARREL = love.graphics.newQuad(0, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
     VERTICAL_BARREL = love.graphics.newQuad(64, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
@@ -204,11 +225,12 @@ function love.load(arg)
     SIDEWALK = love.graphics.newQuad(192 + 64 * 2, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
     STREET_LINES = love.graphics.newQuad(192 + 64 * 3, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
 
+    --[[
     player1:setAniState('idle')
 
     --- put your persons here
 
-    local punk_enemy = new_punk(600, 600, STD_CHR_WIDTH, STD_CHR_HEIGHT)
+    local punk_enemy = NEW_PUNK(600, 600, STD_CHR_WIDTH, STD_CHR_HEIGHT)
 
     punk_enemy:setBboxDimensions(
         player1.width - (torso_spacing * 2), -- frame width of animation has a padding of 2 * torso spacing to make all frame equal width
@@ -221,7 +243,7 @@ function love.load(arg)
 
     table.insert(ENTITIES.enemies, punk_enemy)
 
-    punk_enemy = new_punk(700, 650, STD_CHR_WIDTH, STD_CHR_HEIGHT)
+    punk_enemy = NEW_PUNK(700, 650, STD_CHR_WIDTH, STD_CHR_HEIGHT)
 
     punk_enemy:setBboxDimensions(
         player1.width - (torso_spacing * 2), -- frame width of animation has a padding of 2 * torso spacing to make all frame equal width
@@ -237,13 +259,13 @@ function love.load(arg)
     for index, enemy in ipairs(ENTITIES.enemies) do
         enemy:faceLeft()
     end
-
+--]]
     INIT_WORLD(WORLD)
 end
 
 function INIT_WORLD(WORLD)
     local bbox_width, bbox_height
-
+    --[[
     for i = 1, #ENTITIES.players, 1 do
         local player = ENTITIES.players[i]
         player.name = "player" .. i
@@ -263,7 +285,7 @@ function INIT_WORLD(WORLD)
         enemy:setKickBox(26, 20)
         enemy:setPunchBox(22, 16)
     end
-
+--]]
     for i = 0, 275, 1 do
         table.insert(ENTITIES.road.planks_top, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94 - 64, width = 64, height = 64 })
         table.insert(ENTITIES.road.planks,  Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94, width = 64, height = 64 })
@@ -273,7 +295,7 @@ function INIT_WORLD(WORLD)
         table.insert(ENTITIES.road.STREET, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64, width = 64, height = 64 })
         table.insert(ENTITIES.road.STREET_LINES, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64 * 3, width = 64, height = 64 })
     end
-
+--[[
     WORLD:add( { name = "left bounding box"}, 5, 0, 1, SCREEN_VALUES.height)
     WORLD:add( { name = "top bounding box"}, 5, SCREEN_VALUES.height * (2/5), SCREEN_VALUES.width * 10, 1)
     WORLD:add( { name = "bottom bounding box"}, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
@@ -304,7 +326,7 @@ function INIT_WORLD(WORLD)
     table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 4, width = 64, height = 64 })
     WORLD:add( { name = "6th right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 5, 64, 64)
     table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 5, width = 64, height = 64 })
-
+--]]
 end
 
 function love.update(dt)
@@ -314,6 +336,11 @@ function love.update(dt)
         love.event.quit();
     end
 
+    ENTITIES.players[1].animations.idle.animation:update(dt)
+
+--    ENTITIES.players[1].animation:update(dt)
+
+    --[[
     if not GAME_OVER then
         Score:updateTimer(dt)
         Score:updateScoreCount(dt)
@@ -376,15 +403,21 @@ function love.update(dt)
     end
 
     AI:update(dt, Score, Timer)
+    --]]
 end
 
 function love.draw()
-    love.graphics.scale(SCALE.H, SCALE.V)
+    local player = ENTITIES.players[1];
+    player.animations.idle:drawAt(player.x, player.y)
+    --love.graphics.scale(SCALE.H, SCALE.V)
 
+    --[[
     Score:drawTimer()
     Score:drawScoreCount()
-
+    --]]
     -- Draw each animation and object within the frame
+
+    --[[
     local x_offset, y_offset
     if (locked_camera) then
 
@@ -397,78 +430,42 @@ function love.draw()
 
         love.graphics.translate(-x_offset, -y_offset)
     end
+--]]
 
 
     --- background ---
 
-    --Draw top of planks
 
-    for i = 1, #ENTITIES.road.planks_top do
-        local pands = ENTITIES.road.planks_top[i]
-        if pands:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, PLANK_TOP, pands.x, pands.y)
+    local function DrawBackgroundTiles(tiles, cameraRect, texture, quad, offsetX, offsetY, rotation)
+        offsetX = offsetX or 0
+        offsetY = offsetY or 0
+        for i, g in ipairs(tiles) do
+            if g:isIntersectingRectangles(cameraRect) then
+                love.graphics.draw(texture, quad, g.x + offsetX, g.y + offsetY, rotation)
+            end
         end
     end
 
-    -- planks
-    for i = 1, #ENTITIES.road.planks do
-        local pands = ENTITIES.road.planks[i]
-        if pands:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, PLANK, pands.x, pands.y)
-        end
-    end
+    DrawBackgroundTiles(ENTITIES.road.planks_top, CAMERA_RECTANGLE, STREET, PLANK_TOP)
+    DrawBackgroundTiles(ENTITIES.road.planks, CAMERA_RECTANGLE, STREET, PLANK)
+    DrawBackgroundTiles(ENTITIES.road.PLANK_AND_SIDEWALK, CAMERA_RECTANGLE, STREET, PLANK_AND_SIDEWALK)
+    DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA_RECTANGLE, STREET, SIDEWALK)
+    DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA_RECTANGLE, STREET, GUTTER)
+    DrawBackgroundTiles(ENTITIES.road.STREET_LINES, CAMERA_RECTANGLE, STREET, STREET_LINES)
 
-    -- Draw PLANK and SIDEWALK combo
-    for i = 1, #ENTITIES.road.PLANK_AND_SIDEWALK do
-        local pands = ENTITIES.road.PLANK_AND_SIDEWALK[i]
-        if pands:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, PLANK_AND_SIDEWALK, pands.x, pands.y)
-        end
-    end
-
-    for i = 1, #ENTITIES.road.SIDEWALK do
-        local sw = ENTITIES.road.SIDEWALK[i]
-        if sw:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, SIDEWALK, sw.x, sw.y)
-        end
-    end
-
-    for i = 1, #ENTITIES.road.GUTTER do
-        local g = ENTITIES.road.GUTTER[i]
-        if g:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, GUTTER, g.x, g.y)
-        end
-    end
-
-    -- Draw GUTTER flipped
-
-    for i = 1, #ENTITIES.road.GUTTER do
-        local g = ENTITIES.road.GUTTER[i]
-        if g:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, GUTTER, g.x + 64, g.y + 7 * 64, math.pi)
-        end
-    end
-
-    for i = 1, #ENTITIES.road.STREET do
-        local s = ENTITIES.road.STREET[i]
-        if s:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, ASPHALT, s.x, s.y)
-            love.graphics.draw(STREET, ASPHALT, s.x, s.y + 64)
-            love.graphics.draw(STREET, ASPHALT, s.x, s.y + 64 * 3)
-            love.graphics.draw(STREET, ASPHALT, s.x, s.y + 64 * 4)
-        end
-    end
-
-    for i = 1, #ENTITIES.road.STREET_LINES do
-        local sl = ENTITIES.road.STREET_LINES[i]
-        if sl:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(STREET, STREET_LINES, sl.x, sl.y)
-        end
-    end
-
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64 * 3)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64 * 4)
+    DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA_RECTANGLE, STREET, SIDEWALK, 64, 64 * 9, math.pi)
+    DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA_RECTANGLE, STREET, GUTTER, 64, 64 * 7, math.pi)
 
     --- end of background ---
 
+    DrawBackgroundTiles(ENTITIES.road.barricades, CAMERA_RECTANGLE, OBSTACLES, BARRICADE_QUAD)
+
+
+--[[
     for i = 1, #ENTITIES.road.barricades do
         local barricade = ENTITIES.road.barricades[i]
         if barricade:isIntersectingRectangles(CAMERA_RECTANGLE) then
@@ -484,12 +481,13 @@ function love.draw()
         end
     end
 
-    for i = 1, #ENTITIES.players do
-        local player = ENTITIES.players[i]
+    for _, player in ipairs(ENTITIES.players) do
         local x, y = player:getBboxPosition()
         player.animation:draw(player.image, x, y, 0, 1, 1)
     end
+--]]
 
+    --[[
     if GAME_OVER then
 
         local old_f = love.graphics.getFont()
@@ -503,12 +501,9 @@ function love.draw()
         love.graphics.print("Game Over", position.x, position.y)
 
         love.graphics.setFont(old_f)
-
-        --[[Timer.after(3, function()
-            love.graphics.printf("Game Over", 20, 11 * DEBUG_FONT_SIZE, 1000, "left")
-        end);]]
     end
 
+ 
     if DEBUG then
         love.graphics.translate(x_offset, y_offset)
         DEBUG_info()
@@ -524,11 +519,13 @@ function love.draw()
         love.graphics.rectangle("line", ENTITIES.players[1].x + DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
         love.graphics.rectangle("line", ENTITIES.players[1].x + w - DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
     end
+       --]]
+
 end
 
 function love.resize(width, height)
-	SCALE.H = (width / SCREEN_VALUES.width) * 2
-	SCALE.V = (height / SCREEN_VALUES.height) * 2
+    SCALE.H = (width / SCREEN_VALUES.width) * 2
+    SCALE.V = (height / SCREEN_VALUES.height) * 2
 end
 
 function draw_debuxes()
