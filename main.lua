@@ -11,7 +11,7 @@ local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
 local Camera = require "camera"
 local Char = require "char.Char"
-local Animation = require "char.Animation"
+local Ani = require "char.Animation"
 
 IN_FOCUS = false
 DEBUG = true
@@ -88,16 +88,18 @@ function love.load()
 
     local p1 = Char:new {
         width = 76,
-        height = 104,
-        animations = {}
+        height = 104
     }
 
-    p1.animations.idle = Animation:new(love.graphics.newImage("Assets/miniplayer_idle.png"), p1, {'1-4', 1}, 0.25)
-    p1.animations.walk = Animation:new(love.graphics.newImage("Assets/miniplayer_walk.png"), p1, {'1-4', 1}, 0.1)
-    p1.animations.punch = Animation:new(love.graphics.newImage("Assets/miniplayer_punch.png"), p1, {'1-4', 1}, 0.1)
-    p1.animations.kick = Animation:new(love.graphics.newImage("Assets/miniplayer_kick.png"), p1, {'1-4', 1}, 0.1)
-    p1.animations.death = Animation:new(love.graphics.newImage("Assets/miniplayer_death.png"), {width = 64, height = 104}, {'1-4', 1}, 0.1, "pauseAtEnd")
+    local player1Sheet = love.graphics.newImage("Assets/miniplayer_sheet.png")
 
+    p1.animations:addNewAnimation("idle", { player1Sheet, p1, {'1-4', 1}, 0.25 })
+    p1.animations:addNewAnimation("walk", { player1Sheet, p1, {'1-4', 4}, 0.01 })
+    p1.animations:addNewAnimation("punch", { player1Sheet, p1, {'1-4', 3}, 0.01 })
+    p1.animations:addNewAnimation("kick", { player1Sheet, p1, {'1-4', 2}, 0.01 })
+    p1.animations:addNewAnimation("death", { love.graphics.newImage("Assets/miniplayer_death.png"), {width = 64, height = 104}, {'1-4', 1}, 0.01, "pauseAtEnd" })
+
+    p1.animations:setCurrentAnimation("walk")
 
     table.insert(ENTITIES.players, p1)
 
@@ -336,7 +338,7 @@ function love.update(dt)
         love.event.quit();
     end
 
-    ENTITIES.players[1].animations.idle.animation:update(dt)
+    ENTITIES.players[1]:updateAnimation(dt)
 
 --    ENTITIES.players[1].animation:update(dt)
 
@@ -408,7 +410,8 @@ end
 
 function love.draw()
     local player = ENTITIES.players[1];
-    player.animations.idle:drawAt(player.x, player.y)
+
+    player:drawAnimation()
     --love.graphics.scale(SCALE.H, SCALE.V)
 
     --[[
