@@ -91,13 +91,13 @@ function love.load()
         height = 104
     }
 
-    local player1Sheet = love.graphics.newImage("Assets/miniplayer_sheet.png")
+    local playerSheet = love.graphics.newImage("Assets/miniplayer.png")
 
-    p1.animations:addNewAnimation("idle", { player1Sheet, p1, {'1-4', 1}, 0.25 })
-    p1.animations:addNewAnimation("walk", { player1Sheet, p1, {'1-4', 4}, 0.01 })
-    p1.animations:addNewAnimation("punch", { player1Sheet, p1, {'1-4', 3}, 0.01 })
-    p1.animations:addNewAnimation("kick", { player1Sheet, p1, {'1-4', 2}, 0.01 })
-    p1.animations:addNewAnimation("death", { love.graphics.newImage("Assets/miniplayer_death.png"), {width = 64, height = 104}, {'1-4', 1}, 0.01, "pauseAtEnd" })
+    p1.animations:addNewAnimation("idle",  { playerSheet, p1, {'1-2',1           }, 0.5 })
+    p1.animations:addNewAnimation("walk",  { playerSheet, p1, {1,1, '3-4',2      }, 0.1 })
+    p1.animations:addNewAnimation("punch", { playerSheet, p1, {1,1, 6,1, '1-2',2 }, 0.1 })
+    p1.animations:addNewAnimation("kick",  { playerSheet, p1, {1,1, '3-5',1      }, 0.1 })
+    p1.animations:addNewAnimation("death", { playerSheet, p1, {1,1, '5-6',2, 1,3 }, 0.1, "pauseAtEnd" })
 
     p1.animations:setCurrentAnimation("walk")
 
