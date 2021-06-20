@@ -1,5 +1,5 @@
 { "frames": {
-   "miniplayer (player1) 0.aseprite": {
+   "miniplayer-player1-0": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -7,7 +7,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 1.aseprite": {
+   "miniplayer-player1-1": {
     "frame": { "x": 76, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -15,7 +15,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 2.aseprite": {
+   "miniplayer-player1-2": {
     "frame": { "x": 76, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -23,7 +23,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 3.aseprite": {
+   "miniplayer-player1-3": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -31,7 +31,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 4.aseprite": {
+   "miniplayer-player1-4": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -39,7 +39,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 5.aseprite": {
+   "miniplayer-player1-5": {
     "frame": { "x": 152, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -47,7 +47,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 6.aseprite": {
+   "miniplayer-player1-6": {
     "frame": { "x": 228, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -55,7 +55,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 7.aseprite": {
+   "miniplayer-player1-7": {
     "frame": { "x": 304, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -63,7 +63,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 8.aseprite": {
+   "miniplayer-player1-8": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -71,7 +71,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 9.aseprite": {
+   "miniplayer-player1-9": {
     "frame": { "x": 380, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -79,7 +79,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 10.aseprite": {
+   "miniplayer-player1-10": {
     "frame": { "x": 0, "y": 104, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -87,7 +87,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 11.aseprite": {
+   "miniplayer-player1-11": {
     "frame": { "x": 76, "y": 104, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -95,7 +95,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 12.aseprite": {
+   "miniplayer-player1-12": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -103,7 +103,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 13.aseprite": {
+   "miniplayer-player1-13": {
     "frame": { "x": 152, "y": 104, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -111,7 +111,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 14.aseprite": {
+   "miniplayer-player1-14": {
     "frame": { "x": 228, "y": 104, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -119,7 +119,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 15.aseprite": {
+   "miniplayer-player1-15": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -127,7 +127,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 16.aseprite": {
+   "miniplayer-player1-16": {
     "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -135,7 +135,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 17.aseprite": {
+   "miniplayer-player1-17": {
     "frame": { "x": 304, "y": 104, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -143,7 +143,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 18.aseprite": {
+   "miniplayer-player1-18": {
     "frame": { "x": 380, "y": 104, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -151,7 +151,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player1) 19.aseprite": {
+   "miniplayer-player1-19": {
     "frame": { "x": 0, "y": 208, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -159,7 +159,15 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 0.aseprite": {
+   "miniplayer-player1-20": {
+    "frame": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player1-21": {
     "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -167,7 +175,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 1.aseprite": {
+   "miniplayer-player2-0": {
     "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -175,31 +183,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 2.aseprite": {
-    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 3.aseprite": {
-    "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 4.aseprite": {
-    "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 5.aseprite": {
+   "miniplayer-player2-1": {
     "frame": { "x": 228, "y": 208, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -207,7 +191,31 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 6.aseprite": {
+   "miniplayer-player2-2": {
+    "frame": { "x": 228, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-3": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-4": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-5": {
     "frame": { "x": 304, "y": 208, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -215,7 +223,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 7.aseprite": {
+   "miniplayer-player2-6": {
     "frame": { "x": 380, "y": 208, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -223,15 +231,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 8.aseprite": {
-    "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 9.aseprite": {
+   "miniplayer-player2-7": {
     "frame": { "x": 0, "y": 312, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -239,7 +239,15 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 10.aseprite": {
+   "miniplayer-player2-8": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-9": {
     "frame": { "x": 76, "y": 312, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -247,7 +255,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 11.aseprite": {
+   "miniplayer-player2-10": {
     "frame": { "x": 152, "y": 312, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -255,15 +263,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 12.aseprite": {
-    "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 13.aseprite": {
+   "miniplayer-player2-11": {
     "frame": { "x": 228, "y": 312, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -271,7 +271,15 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 14.aseprite": {
+   "miniplayer-player2-12": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-13": {
     "frame": { "x": 304, "y": 312, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -279,23 +287,7 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 15.aseprite": {
-    "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 16.aseprite": {
-    "frame": { "x": 76, "y": 208, "w": 76, "h": 104 },
-    "rotated": false,
-    "trimmed": false,
-    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
-    "sourceSize": { "w": 76, "h": 104 },
-    "duration": 100
-   },
-   "miniplayer (player2) 17.aseprite": {
+   "miniplayer-player2-14": {
     "frame": { "x": 380, "y": 312, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -303,7 +295,23 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 18.aseprite": {
+   "miniplayer-player2-15": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-16": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-17": {
     "frame": { "x": 0, "y": 416, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
@@ -311,8 +319,32 @@
     "sourceSize": { "w": 76, "h": 104 },
     "duration": 100
    },
-   "miniplayer (player2) 19.aseprite": {
+   "miniplayer-player2-18": {
     "frame": { "x": 76, "y": 416, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-19": {
+    "frame": { "x": 152, "y": 416, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-20": {
+    "frame": { "x": 152, "y": 208, "w": 76, "h": 104 },
+    "rotated": false,
+    "trimmed": false,
+    "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
+    "sourceSize": { "w": 76, "h": 104 },
+    "duration": 100
+   },
+   "miniplayer-player2-21": {
+    "frame": { "x": 228, "y": 416, "w": 76, "h": 104 },
     "rotated": false,
     "trimmed": false,
     "spriteSourceSize": { "x": 0, "y": 0, "w": 76, "h": 104 },
@@ -329,16 +361,15 @@
   "scale": "1",
   "frameTags": [
    { "name": "idle", "from": 0, "to": 3, "direction": "forward" },
-   { "name": "Kick", "from": 4, "to": 7, "direction": "forward" },
+   { "name": "kick", "from": 4, "to": 7, "direction": "forward" },
    { "name": "punch", "from": 8, "to": 11, "direction": "forward" },
    { "name": "walk", "from": 12, "to": 15, "direction": "forward" },
-   { "name": "death", "from": 16, "to": 19, "direction": "forward" }
+   { "name": "death", "from": 16, "to": 19, "direction": "forward" },
+   { "name": "stun", "from": 20, "to": 21, "direction": "forward" }
   ],
   "layers": [
    { "name": "player1", "opacity": 255, "blendMode": "normal" },
    { "name": "player2", "opacity": 255, "blendMode": "normal" }
-  ],
-  "slices": [
   ]
  }
 }
