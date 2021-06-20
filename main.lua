@@ -11,6 +11,7 @@ local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
 local Camera = require "camera"
 local Char = require "char.Char"
+local Animations = require "char.Animation"
 local Ani = require "char.Animation"
 
 IN_FOCUS = false
@@ -93,12 +94,15 @@ function love.load()
 
     local playerSheet = love.graphics.newImage("Assets/miniplayer.png")
 
-    p1.animations:addNewAnimation("idle",  { playerSheet, p1, {'1-2',1           }, 0.5 })
-    p1.animations:addNewAnimation("walk",  { playerSheet, p1, {1,1, '3-4',2      }, 0.1 })
-    p1.animations:addNewAnimation("punch", { playerSheet, p1, {1,1, 6,1, '1-2',2 }, 0.1 })
-    p1.animations:addNewAnimation("kick",  { playerSheet, p1, {1,1, '3-5',1      }, 0.1 })
-    p1.animations:addNewAnimation("death", { playerSheet, p1, {1,1, '5-6',2, 1,3 }, 0.1, "pauseAtEnd" })
+    local player1Animations = Animations.AnimationStates:new();
 
+    player1Animations:addNewAnimation("idle",  { playerSheet, p1, {'1-2',1           }, 0.5 })
+    player1Animations:addNewAnimation("walk",  { playerSheet, p1, {1,1, '3-4',2      }, 0.1 })
+    player1Animations:addNewAnimation("punch", { playerSheet, p1, {1,1, 6,1, '1-2',2 }, 0.1 })
+    player1Animations:addNewAnimation("kick",  { playerSheet, p1, {1,1, '3-5',1      }, 0.1 })
+    player1Animations:addNewAnimation("death", { playerSheet, p1, {1,1, '5-6',2, 1,3 }, 0.1, "pauseAtEnd" })
+
+    p1.animations = player1Animations
     p1.animations:setCurrentAnimation("walk")
 
     table.insert(ENTITIES.players, p1)
