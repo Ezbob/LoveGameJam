@@ -24,10 +24,11 @@ local function split(inputstr, sep)
   return t
 end
 
--- Default label splitter. Returns filename, layer name, and frame index from aseprite JSON frame
+-- Default label splitter. Returns layer name and frame index from aseprite JSON frame
 -- "frame" entries. This is needed to associate the frame data with the meta data.
 local function defaultLabelSplitter(label)
-  return unpack(split(label, "-"))
+  local splitit = split(label, "-")
+  return splitit[2], splitit[3]
 end
 
 function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
@@ -48,7 +49,7 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
   local result = {}
   for key, value in pairs(json_data_["frames"]) do
 
-    local fname, entityName, frameIndex = labelSplitter(key)
+    local entityName, frameIndex = labelSplitter(key)
 
     local column = (value["frame"]["x"] / value["sourceSize"]["w"]) + 1
     local row = (value["frame"]["y"] / value["sourceSize"]["h"]) + 1

@@ -105,7 +105,7 @@ function love.load()
     player1Animations:addNewAnimation("stun",  { playerSheet, p1,  grids["player1"]["stun"], 0.1})
 
     p1.animations = player1Animations
-    p1.animations:setCurrentAnimation("stun")
+    p1.animations:setCurrentAnimation("idle")
 
     table.insert(ENTITIES.players, p1)
 
