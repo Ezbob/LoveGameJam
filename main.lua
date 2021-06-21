@@ -12,6 +12,7 @@ local inspect = require "modules.inspect.inspect"
 local Camera = require "camera"
 local Char = require "char.Char"
 local Animations = require "char.Animation"
+local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
 local Ani = require "char.Animation"
 
 IN_FOCUS = false
@@ -93,17 +94,18 @@ function love.load()
     }
 
     local playerSheet = love.graphics.newImage("Assets/miniplayer.png")
+    local grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
 
     local player1Animations = Animations.AnimationStates:new();
-
-    player1Animations:addNewAnimation("idle",  { playerSheet, p1, {'1-2',1           }, 0.5 })
-    player1Animations:addNewAnimation("walk",  { playerSheet, p1, {1,1, '3-4',2      }, 0.1 })
-    player1Animations:addNewAnimation("punch", { playerSheet, p1, {1,1, 6,1, '1-2',2 }, 0.1 })
-    player1Animations:addNewAnimation("kick",  { playerSheet, p1, {1,1, '3-5',1      }, 0.1 })
-    player1Animations:addNewAnimation("death", { playerSheet, p1, {1,1, '5-6',2, 1,3 }, 0.1, "pauseAtEnd" })
+    player1Animations:addNewAnimation("idle",  { playerSheet, p1, grids["player1"]["idle"], 0.5 })
+    player1Animations:addNewAnimation("walk",  { playerSheet, p1, grids["player1"]["walk"], 0.1 })
+    player1Animations:addNewAnimation("punch", { playerSheet, p1, grids["player1"]["punch"], 0.1 })
+    player1Animations:addNewAnimation("kick",  { playerSheet, p1, grids["player1"]["kick"], 0.1 })
+    player1Animations:addNewAnimation("death", { playerSheet, p1, grids["player1"]["death"], 0.1, "pauseAtEnd" })
+    player1Animations:addNewAnimation("stun",  { playerSheet, p1,  grids["player1"]["stun"], 0.1})
 
     p1.animations = player1Animations
-    p1.animations:setCurrentAnimation("walk")
+    p1.animations:setCurrentAnimation("stun")
 
     table.insert(ENTITIES.players, p1)
 
