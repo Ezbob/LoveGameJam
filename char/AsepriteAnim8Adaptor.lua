@@ -74,6 +74,4 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
   return result
 end
 
-
-
 return AsepriteAnim8Adaptor
