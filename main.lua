@@ -1,9 +1,12 @@
+local Hitbox = require "char.Hitbox"
+
 if DEBUG then
     io.stdout:setvbuf('no')
 end
 local enums = require "enums"
 local bump = require "./modules/bump/bump"
 local Character = require "character"
+local PlayerChar = require "char.PlayerChar"
 local Rectangle = require "rectangle"
 local AI = require "ai"
 local Timer = require "./modules/hump/timer"
@@ -50,6 +53,7 @@ SCALE = {
 }
 
 ENTITIES = {
+    characters = {},
     players = {},
     enemies = {},
     objects = {},
@@ -86,28 +90,70 @@ function love.load()
     love.graphics.setFont(FONT)
     WORLD = bump.newWorld()
     IMAGES = {}
+    local STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
 
-
-    local p1 = Char:new {
-        width = 76,
-        height = 104
+    ANIMATION_ASSETS = {
+        enemy1 = Animations.AnimationStates:new(),
+        player1 = Animations.AnimationStates:new()
     }
 
-    local playerSheet = love.graphics.newImage("Assets/miniplayer.png")
+    local characterSheet = love.graphics.newImage("Assets/miniplayer.png")
     local grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
 
-    local player1Animations = Animations.AnimationStates:new();
-    player1Animations:addNewAnimation("idle",  { playerSheet, p1, grids["player1"]["idle"], 0.5 })
-    player1Animations:addNewAnimation("walk",  { playerSheet, p1, grids["player1"]["walk"], 0.1 })
-    player1Animations:addNewAnimation("punch", { playerSheet, p1, grids["player1"]["punch"], 0.1 })
-    player1Animations:addNewAnimation("kick",  { playerSheet, p1, grids["player1"]["kick"], 0.1 })
-    player1Animations:addNewAnimation("death", { playerSheet, p1, grids["player1"]["death"], 0.1, "pauseAtEnd" })
-    player1Animations:addNewAnimation("stun",  { playerSheet, p1,  grids["player1"]["stun"], 0.1})
+    local charbox = {width = STD_CHR_WIDTH, height = STD_CHR_HEIGHT}
 
-    p1.animations = player1Animations
-    p1.animations:setCurrentAnimation("idle")
+    ANIMATION_ASSETS.player1:addNewState("idle",  { characterSheet, charbox, grids["player1"]["idle"], 0.5 })
+    ANIMATION_ASSETS.player1:addNewState("walk",  { characterSheet, charbox, grids["player1"]["walk"], 0.1 })
+    ANIMATION_ASSETS.player1:addNewState("punch", { characterSheet, charbox, grids["player1"]["punch"], 0.1 })
+    ANIMATION_ASSETS.player1:addNewState("kick",  { characterSheet, charbox, grids["player1"]["kick"], 0.1 })
+    ANIMATION_ASSETS.player1:addNewState("death", { characterSheet, charbox, grids["player1"]["death"], 0.1, "pauseAtEnd" })
+    ANIMATION_ASSETS.player1:addNewState("stun",  { characterSheet, charbox, grids["player1"]["stun"], 0.1})
 
+    ANIMATION_ASSETS.enemy1:addNewState("idle",  { characterSheet, charbox, grids["enemy1"]["idle"], 0.5 })
+    ANIMATION_ASSETS.enemy1:addNewState("walk",  { characterSheet, charbox, grids["enemy1"]["walk"], 0.1 })
+    ANIMATION_ASSETS.enemy1:addNewState("punch", { characterSheet, charbox, grids["enemy1"]["punch"], 0.1 })
+    ANIMATION_ASSETS.enemy1:addNewState("kick",  { characterSheet, charbox, grids["enemy1"]["kick"], 0.1 })
+    ANIMATION_ASSETS.enemy1:addNewState("death", { characterSheet, charbox, grids["enemy1"]["death"], 0.1, "pauseAtEnd" })
+    ANIMATION_ASSETS.enemy1:addNewState("stun",  { characterSheet, charbox, grids["enemy1"]["stun"], 0.1})
+
+    local p1 = PlayerChar:new {
+        width = STD_CHR_WIDTH,
+        height = STD_CHR_HEIGHT,
+        x = 100,
+        y = SCREEN_VALUES.height * 0.65,
+        animations = ANIMATION_ASSETS.player1,
+        bodyHitbox = Hitbox:new {
+            offset_x = 25,
+            offset_y = 50,
+            width = 25,
+            height = 50
+        }
+    }
+
+    local e1 = Char:new {
+        width = STD_CHR_WIDTH,
+        height = STD_CHR_HEIGHT,
+        x = 700,
+        y = SCREEN_VALUES.height * 0.7,
+        animations = ANIMATION_ASSETS.enemy1
+    }
+
+    table.insert(ENTITIES.characters, e1)
+    table.insert(ENTITIES.characters, p1)
     table.insert(ENTITIES.players, p1)
+    table.insert(ENTITIES.enemies, e1)
+
+    for i, c in ipairs(ENTITIES.characters) do
+        c.animations:setCurrentAnimation("idle")
+    end
+
+    for i, e in ipairs(ENTITIES.enemies) do
+        e.animations:getCurrentAnimation():flipHorizontal()
+    end
+
+    if HAS_JOYSTICKS then
+        ENTITIES.players[1].control_scheme = enums.control_schemes.controller
+    end
 
     --[[
     STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
@@ -129,15 +175,12 @@ function love.load()
         }
     )
 
-    if HAS_JOYSTICKS then
-        player1.control_scheme = enums.control_schemes.controller
-    end
+
 
     table.insert(ENTITIES.players, player1)
 
     Score:setupTimer(0)
     Score:setupScoreCount(0)
---]]
 
     IMAGE_ASSETS = {
         player1 = {
@@ -164,7 +207,7 @@ function love.load()
         }
     }
 
-    --[[
+
     local j = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.punch:getWidth(), char.punch:getHeight())
     local k = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.walk:getWidth(), char.walk:getHeight())
     local l = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.kick:getWidth(), char.kick:getHeight())
@@ -308,33 +351,35 @@ function INIT_WORLD(WORLD)
     WORLD:add( { name = "top bounding box"}, 5, SCREEN_VALUES.height * (2/5), SCREEN_VALUES.width * 10, 1)
     WORLD:add( { name = "bottom bounding box"}, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
     WORLD:add( { name = "right bounding box"}, SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
-
-    WORLD:add( { name = "1st left barricade"}, 5, 500, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500, width = 64, height = 64 })
-    WORLD:add( { name = "2nd left barricade"}, 5, 500 + 64, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 , width = 64, height = 64 })
-    WORLD:add( { name = "3rd left barricade"}, 5, 500 + 64 * 2, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 2, width = 64, height = 64 })
-    WORLD:add( { name = "4rd left barricade"}, 5, 500 + 64 * 3, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 3, width = 64, height = 64 })
-    WORLD:add( { name = "5th left barricade"}, 5, 500 + 64 * 4, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 4, width = 64, height = 64 })
-    WORLD:add( { name = "6th left barricade"}, 5, 500 + 64 * 5, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 5, width = 64, height = 64 })
-
-    WORLD:add( { name = "1st right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 , width = 64, height = 64 })
-    WORLD:add( { name = "2nd right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64, width = 64, height = 64 })
-    WORLD:add( { name = "3rd right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 2, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 2, width = 64, height = 64 })
-    WORLD:add( { name = "4rd right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 3, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 3 , width = 64, height = 64 })
-    WORLD:add( { name = "5th right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 4, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 4, width = 64, height = 64 })
-    WORLD:add( { name = "6th right barricade"}, SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 5, 64, 64)
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 5, width = 64, height = 64 })
 --]]
+    --WORLD:add( { name = "1st left barricade"}, 5, 500, 64, 64)
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 - (64 * 2), width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 - 64, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 , width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 2, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 3, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 4, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 5, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 6, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 7, width = 64, height = 64 })
+
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 - (64 * 2), width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 - 64, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 , width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 2, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 3 , width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 4, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 5, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 6, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 7, width = 64, height = 64 })
+
+
+    for i, rect in ipairs(ENTITIES.road.barricades) do
+        WORLD:add( { name = string.format("%d barricade", i) }, rect.x, rect.y, rect.width, rect.height)
+    end
+
 end
 
 function love.update(dt)
@@ -344,8 +389,10 @@ function love.update(dt)
         love.event.quit();
     end
 
-    ENTITIES.players[1]:updateAnimation(dt)
-
+    for i, c in ipairs(ENTITIES.characters) do
+        c:update(dt)
+    end
+    
 --    ENTITIES.players[1].animation:update(dt)
 
     --[[
@@ -415,9 +462,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    local player = ENTITIES.players[1];
 
-    player:drawAnimation()
     --love.graphics.scale(SCALE.H, SCALE.V)
 
     --[[
@@ -473,7 +518,9 @@ function love.draw()
 
     DrawBackgroundTiles(ENTITIES.road.barricades, CAMERA_RECTANGLE, OBSTACLES, BARRICADE_QUAD)
 
-
+    for i, c in ipairs(ENTITIES.characters) do
+        c:draw()
+    end
 --[[
     for i = 1, #ENTITIES.road.barricades do
         local barricade = ENTITIES.road.barricades[i]
@@ -512,7 +559,13 @@ function love.draw()
         love.graphics.setFont(old_f)
     end
 
- 
+    --]]
+    if DEBUG then
+        for i, c in ipairs(ENTITIES.characters) do
+            c:drawDebug();
+        end
+    end
+    --[[
     if DEBUG then
         love.graphics.translate(x_offset, y_offset)
         DEBUG_info()
