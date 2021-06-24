@@ -121,14 +121,14 @@ function love.load()
         height = STD_CHR_HEIGHT,
         x = 100,
         y = SCREEN_VALUES.height * 0.65,
-        animations = ANIMATION_ASSETS.player1,
-        bodyHitbox = Hitbox:new {
-            offset_x = 25,
-            offset_y = 50,
-            width = 25,
-            height = 50
-        }
+        animations = ANIMATION_ASSETS.player1
     }
+
+    p1:addHitbox("body", 25, 50, 25, 50)
+    p1:addHitbox("punch_right", 55, 54, 24, 20)
+    p1:addHitbox("punch_left", -3, 54, 24, 20)
+    p1:addHitbox("kick_right", 55, 77, 28, 20)
+    p1:addHitbox("kick_left", -7, 77, 28, 20)
 
     local e1 = Char:new {
         width = STD_CHR_WIDTH,
@@ -137,6 +137,13 @@ function love.load()
         y = SCREEN_VALUES.height * 0.7,
         animations = ANIMATION_ASSETS.enemy1
     }
+
+    e1:addHitbox("body", 25, 50, 25, 50)
+    e1:addHitbox("punch_right", 55, 54, 24, 20)
+    e1:addHitbox("punch_left", -3, 54, 24, 20)
+    e1:addHitbox("kick_right", 55, 77, 28, 20)
+    e1:addHitbox("kick_left", -7, 77, 28, 20)
+
 
     table.insert(ENTITIES.characters, e1)
     table.insert(ENTITIES.characters, p1)
