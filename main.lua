@@ -5,7 +5,6 @@ if DEBUG then
 end
 local enums = require "enums"
 local bump = require "./modules/bump/bump"
-local Character = require "character"
 local PlayerChar = require "char.PlayerChar"
 local Rectangle = require "rectangle"
 local AI = require "ai"
@@ -13,10 +12,9 @@ local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
 local Camera = require "camera"
-local Char = require "char.Char"
 local Animations = require "char.Animation"
 local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
-local Ani = require "char.Animation"
+local PunkChar = require "char.PunkChar"
 
 IN_FOCUS = false
 DEBUG = true
@@ -124,26 +122,13 @@ function love.load()
         animations = ANIMATION_ASSETS.player1
     }
 
-    p1:addHitbox("body", 25, 50, 25, 50)
-    p1:addHitbox("punch_right", 55, 54, 24, 20)
-    p1:addHitbox("punch_left", -3, 54, 24, 20)
-    p1:addHitbox("kick_right", 55, 77, 28, 20)
-    p1:addHitbox("kick_left", -7, 77, 28, 20)
-
-    local e1 = Char:new {
+    local e1 = PunkChar:new {
         width = STD_CHR_WIDTH,
         height = STD_CHR_HEIGHT,
         x = 700,
         y = SCREEN_VALUES.height * 0.7,
         animations = ANIMATION_ASSETS.enemy1
     }
-
-    e1:addHitbox("body", 25, 50, 25, 50)
-    e1:addHitbox("punch_right", 55, 54, 24, 20)
-    e1:addHitbox("punch_left", -3, 54, 24, 20)
-    e1:addHitbox("kick_right", 55, 77, 28, 20)
-    e1:addHitbox("kick_left", -7, 77, 28, 20)
-
 
     table.insert(ENTITIES.characters, e1)
     table.insert(ENTITIES.characters, p1)

@@ -1,10 +1,10 @@
 local Char = require "char.Char"
 
-local PlayerChar = Char:new()
+local PunkChar = Char:new()
 
-function PlayerChar:new(o)
+function PunkChar:new(o)
   local r = o or {}
-  r.type = "player"
+  r.type = "punk"
   setmetatable(r, self)
   self.__index = self
 
@@ -17,5 +17,4 @@ function PlayerChar:new(o)
   return r
 end
 
-
-return PlayerChar
+return PunkChar

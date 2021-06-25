@@ -58,4 +58,12 @@ function Char:addHitbox(tag, x_offset, y_offset, width, height)
   })
 end
 
+function Char:removeHitbox(tag)
+  self.hitboxes[tag] = nil
+end
+
+function Char:getHitbox(tag)
+  return self.hitboxes[tag]
+end
+
 return Char
