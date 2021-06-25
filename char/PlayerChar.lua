@@ -10,12 +10,5 @@ function PlayerChar:new(o)
   return r
 end
 
-function PlayerChar:update(dt)
-  Char.update(self, dt)
-end
-
-function PlayerChar:drawDebug()
-  Char.drawDebug(self)
-end
 
 return PlayerChar
