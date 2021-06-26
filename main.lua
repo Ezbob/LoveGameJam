@@ -380,27 +380,6 @@ function love.draw()
     for i, c in ipairs(ENTITIES.characters) do
         c:draw()
     end
---[[
-    for i = 1, #ENTITIES.road.barricades do
-        local barricade = ENTITIES.road.barricades[i]
-        if barricade:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            love.graphics.draw(OBSTACLES, BARRICADE_QUAD, barricade.x, barricade.y)
-        end
-    end
-
-    for i = 1, #ENTITIES.enemies do
-        local enemy = ENTITIES.enemies[i]
-        if enemy:isIntersectingRectangles(CAMERA_RECTANGLE) then
-            local x, y = enemy:getBboxPosition()
-            enemy.animation:draw(enemy.image, x, y, 0, 1, 1)
-        end
-    end
-
-    for _, player in ipairs(ENTITIES.players) do
-        local x, y = player:getBboxPosition()
-        player.animation:draw(player.image, x, y, 0, 1, 1)
-    end
---]]
 
     --[[
     if GAME_OVER then
