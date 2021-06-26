@@ -8,7 +8,7 @@ local Char = Rectangle:new {
 
 function Char:new(o)
   local r = o or {}
-  r.effects = r.effects or { stunned = false }
+  r.effects = r.effects or nil
   r.health = r.health or 100
   r.movement_speed = r.movement_speed or 0
   r.animations = r.animations or nil
@@ -23,7 +23,7 @@ end
 function Char:update(dt)
   self.animations:updateState(self.currentAnimation, dt)
 
-  for key, hitbox in pairs(self.hitboxes) do
+  for _, hitbox in pairs(self.hitboxes) do
     hitbox.x = self.x + hitbox.offset_x
     hitbox.y = self.y + hitbox.offset_y
   end
