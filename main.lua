@@ -97,16 +97,20 @@ function love.load()
     }
 
     local p1 = PlayerChar:newPlayer(
+        1,
         100,
         SCREEN_VALUES.height * 0.65,
         "player1"
     )
 
     local p2 = PlayerChar:newPlayer(
+        2,
         100,
         SCREEN_VALUES.height * 0.55,
         "player2"
     )
+
+    print(inspect(p2))
 
     local e1 = PunkChar:newPunk(
         700,
@@ -118,24 +122,23 @@ function love.load()
         SCREEN_VALUES.height * 0.62
     )
 
-    table.insert(ENTITIES.characters, e1)
-    table.insert(ENTITIES.characters, e2)
-    table.insert(ENTITIES.characters, p1)
-    table.insert(ENTITIES.characters, p2)
     table.insert(ENTITIES.players, p1)
     table.insert(ENTITIES.players, p2)
     table.insert(ENTITIES.enemies, e1)
     table.insert(ENTITIES.enemies, e2)
 
-    for i, c in ipairs(ENTITIES.characters) do
+    for _, p in ipairs(ENTITIES.players) do
+        table.insert(ENTITIES.characters, p)
+    end
+    for _, p in ipairs(ENTITIES.enemies) do
+        table.insert(ENTITIES.characters, p)
+    end
+
+    for _, c in ipairs(ENTITIES.characters) do
         c:setCurrentAnimation("idle")
     end
 
-    for i, e in ipairs(ENTITIES.enemies) do
-        print(i, e)
-        for j, hbox in pairs(e.hitboxes) do
-            print( j, hbox)
-        end
+    for _, e in ipairs(ENTITIES.enemies) do
         e:flipHorizontal()
     end
 
@@ -146,112 +149,13 @@ function love.load()
     Score:setupTimer(0)
     Score:setupScoreCount(0)
 
-    --[[
-    STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
-
-    local player1 = Character:newPlayerChar(
-        100, SCREEN_VALUES.height * 0.7,
-        200, 10, 1, STD_CHR_WIDTH, STD_CHR_HEIGHT)
-
-    local torso_spacing = 25
-    local head_room = 58
-    local leg_length = 20
-
-    player1:setBboxDimensions(
-        player1.width - (torso_spacing * 2), -- frame width of animation has a padding of 2 * torso spacing to make all frame equal width
-        player1.height - head_room, -- frame width of animation has a padding head_room (space over the head) to make all frame equal height
-        { -- bounding box frame offsets, for drawing the frame
-            x = torso_spacing,
-            y = head_room - leg_length
-        }
-    )
-
-
-
-    table.insert(ENTITIES.players, player1)
-
-    Score:setupTimer(0)
-    Score:setupScoreCount(0)
-
-    IMAGE_ASSETS = {
-        player1 = {
-            idle = love.graphics.newImage("Assets/miniplayer_idle.png"),
-            punch = love.graphics.newImage("Assets/miniplayer_punch.png"),
-            walk = love.graphics.newImage("Assets/miniplayer_walk.png"),
-            kick = love.graphics.newImage("Assets/miniplayer_kick.png"),
-            death = love.graphics.newImage("Assets/miniplayer_death.png"),
-            stun = love.graphics.newImage("Assets/miniplayer_stun.png")
-        },
-        punk = {
-            idle = love.graphics.newImage("Assets/minienemy1_idle.png"),
-            punch = love.graphics.newImage("Assets/minienemy1_punch.png"),
-            walk = love.graphics.newImage("Assets/minienemy1_walk.png"),
-            kick = love.graphics.newImage("Assets/minienemy1_kick.png"),
-            death = love.graphics.newImage("Assets/minienemy1_death.png"),
-            stun = love.graphics.newImage("Assets/minienemy1_stun.png")
-        },
-        heavy = {
-            idle = love.graphics.newImage("Assets/minienemy2_idle.png"),
-            kick = love.graphics.newImage("Assets/minienemy2_kick.png"),
-            punch = love.graphics.newImage("Assets/minienemy2_punch.png"),
-            walk = love.graphics.newImage("Assets/minienemy2_walk.png")
-        }
-    }
-
-
-    local j = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.punch:getWidth(), char.punch:getHeight())
-    local k = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.walk:getWidth(), char.walk:getHeight())
-    local l = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.kick:getWidth(), char.kick:getHeight())
-    local m = anim8.newGrid(64, 104, char.death:getWidth(), char.death:getHeight())
-    local stun = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.stun:getWidth(), char.stun:getHeight())
-
-    char = IMAGE_ASSETS['punk']
-    local epi = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.idle:getWidth(), char.idle:getHeight())
-    local epk = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.kick:getWidth(), char.kick:getHeight())
-    local epp = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.punch:getWidth(), char.punch:getHeight())
-    local epw = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.walk:getWidth(), char.walk:getHeight())
-    local epd = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.death:getWidth(), char.death:getHeight())
-    local epstun = anim8.newGrid(STD_CHR_WIDTH, STD_CHR_HEIGHT, char.stun:getWidth(), char.stun:getHeight())
-
-    char = IMAGE_ASSETS['heavy']
-    local ehi = anim8.newGrid(64, 104, char.idle:getWidth(), char.idle:getHeight())
-    local ehk = anim8.newGrid(64, 104, char.kick:getWidth(), char.kick:getHeight())
-    local ehp = anim8.newGrid(64, 104, char.punch:getWidth(), char.punch:getHeight())
-    local ehw = anim8.newGrid(64, 104, char.walk:getWidth(), char.walk:getHeight())
-
-    ANIMATION_ASSETS = {
-        player1 = {
-            idle = anim8.newAnimation(h('1-4', 1), 0.25),
-            punch = anim8.newAnimation(j('1-4', 1), 0.1),
-            walk = anim8.newAnimation(k('1-4', 1), 0.1),
-            kick = anim8.newAnimation(l('1-4', 1), 0.1),
-            death = anim8.newAnimation(m('1-4', 1), 0.25, "pauseAtEnd"),
-            stun = anim8.newAnimation(stun('1-2', 1), {.05, .60}, "pauseAtEnd")
-        },
-        punk = {
-            idle = anim8.newAnimation(epi('1-4', 1), 0.25),
-            kick = anim8.newAnimation(epk('1-4', 1), 0.1),
-            punch = anim8.newAnimation(epp('1-4', 1), 0.1),
-            walk = anim8.newAnimation(epw('1-4', 1), 0.1),
-            death = anim8.newAnimation(epd('1-6', 1), 0.25, "pauseAtEnd"),
-            stun = anim8.newAnimation(epstun('1-2', 1), {.05, .60}, "pauseAtEnd")
-        },
-        heavy = {
-            idle = anim8.newAnimation(ehi('1-4', 1), 0.25),
-            kick = anim8.newAnimation(ehk('1-4', 1), 0.1),
-            punch = anim8.newAnimation(ehp('1-4', 1), 0.1),
-            walk = anim8.newAnimation(ehw('1-4', 1), 0.1)
-        }
-    }
-
-
     -- Init map
     CARS = love.graphics.newImage("Assets/CARS.png")
     GREEN_CAR = love.graphics.newQuad(0, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
     YELLOW_CAR = love.graphics.newQuad(128, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
     RED_CAR = love.graphics.newQuad(256, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
     BLUE_CAR = love.graphics.newQuad(256 + 128, 0, 128, 128, CARS:getWidth(), CARS:getHeight())
-]]--
+
     OBSTACLES = love.graphics.newImage("Assets/obstacles_small.png")
     STANDING_BARREL = love.graphics.newQuad(0, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
     VERTICAL_BARREL = love.graphics.newQuad(64, 0, 64, 64, OBSTACLES:getWidth(), OBSTACLES:getHeight())
@@ -267,41 +171,6 @@ function love.load()
     SIDEWALK = love.graphics.newQuad(192 + 64 * 2, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
     STREET_LINES = love.graphics.newQuad(192 + 64 * 3, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
 
-    --[[
-    player1:setAniState('idle')
-
-    --- put your persons here
-
-    local punk_enemy = NEW_PUNK(600, 600, STD_CHR_WIDTH, STD_CHR_HEIGHT)
-
-    punk_enemy:setBboxDimensions(
-        player1.width - (torso_spacing * 2), -- frame width of animation has a padding of 2 * torso spacing to make all frame equal width
-        player1.height - head_room, -- frame width of animation has a padding head_room (space over the head) to make all frame equal height
-        { -- bounding box frame offsets, for drawing the frame
-            x = torso_spacing,
-            y = head_room - leg_length
-        }
-    )
-
-    table.insert(ENTITIES.enemies, punk_enemy)
-
-    punk_enemy = NEW_PUNK(700, 650, STD_CHR_WIDTH, STD_CHR_HEIGHT)
-
-    punk_enemy:setBboxDimensions(
-        player1.width - (torso_spacing * 2), -- frame width of animation has a padding of 2 * torso spacing to make all frame equal width
-        player1.height - head_room, -- frame width of animation has a padding head_room (space over the head) to make all frame equal height
-        { -- bounding box frame offsets, for drawing the frame
-            x = torso_spacing,
-            y = head_room - leg_length
-        }
-    )
-
-    table.insert(ENTITIES.enemies, punk_enemy)
-
-    for index, enemy in ipairs(ENTITIES.enemies) do
-        enemy:faceLeft()
-    end
---]]
     INIT_WORLD(WORLD)
 end
 
@@ -362,7 +231,7 @@ function love.update(dt)
         ( HAS_JOYSTICKS and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
         love.event.quit();
     end
---[[
+
     local isAnyAlive = true
     for i, p in ipairs(ENTITIES.players) do
         isAnyAlive = isAnyAlive and p:isAlive();
@@ -372,7 +241,7 @@ function love.update(dt)
         GAMEOVER_COLORS.G = math.max(GAMEOVER_COLORS.G - dt * 148, 0)
         GAMEOVER_COLORS.B = math.max(GAMEOVER_COLORS.B - dt * 148, 0)
     end
---]]
+
     for i, c in ipairs(ENTITIES.characters) do
         c:update(dt)
     end
