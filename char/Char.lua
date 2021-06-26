@@ -12,7 +12,7 @@ function Char:new(o)
   r.health = r.health or 100
   r.movement_speed = r.movement_speed or 0
   r.animations = r.animations or nil
-  r.hitboxes = r.hitboxes or {}
+  r.hitboxes = r.hitboxes or nil
   r.alive = true
   r.currentAnimation = r.currentAnimation or 'idle'
   setmetatable(r, self)
@@ -61,6 +61,9 @@ function Char:drawDebug(style)
 end
 
 function Char:addHitbox(tag, x_offset, y_offset, width, height)
+  if self.hitboxes == nil then
+    self.hitboxes = {}
+  end
   self.hitboxes[tag] = Hitbox:new({
     type = tag,
     offset_x = x_offset,

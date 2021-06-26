@@ -28,4 +28,23 @@ function PunkChar:setupAnimations(sheet, grids, entity)
   self.animations:addNewState("stun", grids[entity]["stun"], 0.1)
 end
 
+-- Shorthand for creating a new player
+function PunkChar:newPunk(x, y, animationTag, width, height, sheet, grid)
+  width = width or 76
+  height = height or 104
+  sheet = sheet or ASSETS["character"].sheet
+  grid = grid or ASSETS["character"].grids
+  animationTag = animationTag or "enemy1"
+
+  local newChar = PunkChar:new {
+    width = width,
+    height = height,
+    x = x,
+    y = y
+  }
+
+  newChar:setupAnimations(sheet, grid, animationTag)
+  return newChar
+end
+
 return PunkChar

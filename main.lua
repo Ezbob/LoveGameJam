@@ -90,43 +90,52 @@ function love.load()
     love.graphics.setFont(FONT)
     WORLD = bump.newWorld()
     IMAGES = {}
-    local STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
-
 
     ASSETS["character"] = {
         sheet = love.graphics.newImage("Assets/miniplayer.png"),
         grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
     }
 
-    local p1 = PlayerChar:new {
-        width = STD_CHR_WIDTH,
-        height = STD_CHR_HEIGHT,
-        x = 100,
-        y = SCREEN_VALUES.height * 0.65
-    }
+    local p1 = PlayerChar:newPlayer(
+        100,
+        SCREEN_VALUES.height * 0.65,
+        "player1"
+    )
 
-    p1:setupAnimations(ASSETS["character"].sheet, ASSETS["character"].grids, "player1")
+    local p2 = PlayerChar:newPlayer(
+        100,
+        SCREEN_VALUES.height * 0.55,
+        "player2"
+    )
 
+    local e1 = PunkChar:newPunk(
+        700,
+        SCREEN_VALUES.height * 0.7
+    )
 
-    local e1 = PunkChar:new {
-        width = STD_CHR_WIDTH,
-        height = STD_CHR_HEIGHT,
-        x = 700,
-        y = SCREEN_VALUES.height * 0.7
-    }
-
-    e1:setupAnimations(ASSETS["character"].sheet, ASSETS["character"].grids, "enemy1")
+    local e2 = PunkChar:newPunk(
+        800,
+        SCREEN_VALUES.height * 0.62
+    )
 
     table.insert(ENTITIES.characters, e1)
+    table.insert(ENTITIES.characters, e2)
     table.insert(ENTITIES.characters, p1)
+    table.insert(ENTITIES.characters, p2)
     table.insert(ENTITIES.players, p1)
+    table.insert(ENTITIES.players, p2)
     table.insert(ENTITIES.enemies, e1)
+    table.insert(ENTITIES.enemies, e2)
 
     for i, c in ipairs(ENTITIES.characters) do
         c:setCurrentAnimation("idle")
     end
 
     for i, e in ipairs(ENTITIES.enemies) do
+        print(i, e)
+        for j, hbox in pairs(e.hitboxes) do
+            print( j, hbox)
+        end
         e:flipHorizontal()
     end
 
