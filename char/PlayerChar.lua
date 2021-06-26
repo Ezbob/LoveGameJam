@@ -157,23 +157,34 @@ end
 
 function PlayerChar:update(dt)
   Char.update(self, dt)
+
   local control = nil
   if self.playerId == 1 then
     control = update_as_left
   else
     control = update_as_right
   end
-  local x, y, punch, kick = control(dt)
-  self:move(x, y)
-  if x == y and x == 0 then
-    self:setCurrentAnimation('idle')
-  else
-    if (x < 0 and self:isFacingRight()) or (x > 0 and not self:isFacingRight()) then
-      self:flipHorizontal()
-    end
 
-    self:setCurrentAnimation('walk')
+  local x, y, punch, kick = control(dt)
+
+  self:move(x, y)
+
+  local nextAnimation = "idle"
+  if x ~= y then
+    nextAnimation = 'walk'
+  elseif punch then
+    nextAnimation = 'punch'
+  elseif kick then
+    nextAnimation = 'kick'
   end
+
+  if x < 0 then
+    self:faceLeft()
+  elseif x > 0 then
+    self:faceRight()
+  end
+
+  self:setCurrentAnimation(nextAnimation)
 end
 
 return PlayerChar

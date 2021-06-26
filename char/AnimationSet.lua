@@ -54,4 +54,10 @@ function AnimationSet:updateState(name, dt)
   end
 end
 
+function AnimationSet:flipAllHorizontal()
+  for k, p in pairs(self.set) do
+    p:flipH()
+  end
+end
+
 return AnimationSet

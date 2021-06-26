@@ -31,7 +31,29 @@ end
 function Char:isFacingRight()
   local state = self.animations:getState(self.currentAnimation)
   if state then
-    return not state.flippedH
+    return state:isFlipped()
+  end
+end
+
+function Char:faceRight()
+  local state = self.animations:getState(self.currentAnimation)
+  if not state then
+    return
+  end
+  local isAnimationFlipped = state.flippedH
+  if isAnimationFlipped then
+    self.animations:flipAllHorizontal()
+  end
+end
+
+function Char:faceLeft()
+  local state = self.animations:getState(self.currentAnimation)
+  if not state then
+    return
+  end
+  local isAnimationFlipped = state.flippedH
+  if not isAnimationFlipped then
+    self.animations:flipAllHorizontal()
   end
 end
 
