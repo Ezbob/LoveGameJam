@@ -11,7 +11,7 @@ function Char:new(o)
   r.effects = r.effects or { stunned = false }
   r.health = r.health or 100
   r.movement_speed = r.movement_speed or 0
-  r.animations = r.animations or {}
+  r.animations = r.animations or nil
   r.hitboxes = r.hitboxes or {}
   r.alive = true
   r.currentAnimation = r.currentAnimation or 'idle'

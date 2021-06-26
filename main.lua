@@ -75,7 +75,7 @@ CAMERA_RECTANGLE = Camera:new {
 }
 
 ASSETS = {
-
+    character = {}
 }
 
 FONT = nil
@@ -98,38 +98,24 @@ function love.load()
         grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
     }
 
-    local charbox = {width = STD_CHR_WIDTH, height = STD_CHR_HEIGHT}
-
     local p1 = PlayerChar:new {
         width = STD_CHR_WIDTH,
         height = STD_CHR_HEIGHT,
         x = 100,
-        y = SCREEN_VALUES.height * 0.65,
-        animations = AnimationSet:new(ASSETS["character"].sheet, charbox)
+        y = SCREEN_VALUES.height * 0.65
     }
 
-    p1.animations:addNewState("idle", ASSETS["character"].grids["player1"]["idle"], 0.5)
-    p1.animations:addNewState("walk", ASSETS["character"].grids["player1"]["walk"], 0.1)
-    p1.animations:addNewState("punch", ASSETS["character"].grids["player1"]["punch"], 0.1)
-    p1.animations:addNewState("kick", ASSETS["character"].grids["player1"]["kick"], 0.1)
-    p1.animations:addNewState("death", ASSETS["character"].grids["player1"]["death"], 0.1, "pauseAtEnd")
-    p1.animations:addNewState("stun", ASSETS["character"].grids["player1"]["stun"], 0.1)
+    p1:setupAnimations(ASSETS["character"].sheet, ASSETS["character"].grids, "player1")
 
 
     local e1 = PunkChar:new {
         width = STD_CHR_WIDTH,
         height = STD_CHR_HEIGHT,
         x = 700,
-        y = SCREEN_VALUES.height * 0.7,
-        animations = AnimationSet:new(ASSETS["character"].sheet, charbox)
+        y = SCREEN_VALUES.height * 0.7
     }
 
-    e1.animations:addNewState("idle", ASSETS["character"].grids["enemy1"]["idle"], 0.5)
-    e1.animations:addNewState("walk", ASSETS["character"].grids["enemy1"]["walk"], 0.1)
-    e1.animations:addNewState("punch", ASSETS["character"].grids["enemy1"]["punch"], 0.1)
-    e1.animations:addNewState("kick", ASSETS["character"].grids["enemy1"]["kick"], 0.1)
-    e1.animations:addNewState("death", ASSETS["character"].grids["enemy1"]["death"], 2, "pauseAtEnd")
-    e1.animations:addNewState("stun", ASSETS["character"].grids["enemy1"]["stun"], 0.1)
+    e1:setupAnimations(ASSETS["character"].sheet, ASSETS["character"].grids, "enemy1")
 
     table.insert(ENTITIES.characters, e1)
     table.insert(ENTITIES.characters, p1)

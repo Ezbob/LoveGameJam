@@ -1,4 +1,5 @@
 local Char = require "char.Char"
+local AnimationSet = require "char.AnimationSet"
 
 local PlayerChar = Char:new()
 
@@ -22,5 +23,15 @@ function PlayerChar:die()
   self:setCurrentAnimation('death')
 end
 
+
+function PlayerChar:setupAnimations(sheet, grids, entity)
+  self.animations = AnimationSet:new(sheet, {width = self.width, height = self.height})
+  self.animations:addNewState("idle", grids[entity]["idle"], 0.5)
+  self.animations:addNewState("walk", grids[entity]["walk"], 0.1)
+  self.animations:addNewState("punch", grids[entity]["punch"], 0.1)
+  self.animations:addNewState("kick", grids[entity]["kick"], 0.1)
+  self.animations:addNewState("death", grids[entity]["death"], 0.1, "pauseAtEnd")
+  self.animations:addNewState("stun", grids[entity]["stun"], 0.1)
+end
 
 return PlayerChar
