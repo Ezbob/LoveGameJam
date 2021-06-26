@@ -74,6 +74,10 @@ CAMERA_RECTANGLE = Camera:new {
     height = SCREEN_VALUES.height
 }
 
+ASSETS = {
+
+}
+
 FONT = nil
 
 function love.focus(focus)
@@ -88,46 +92,28 @@ function love.load()
     IMAGES = {}
     local STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
 
-    --[[
-    ANIMATION_ASSETS = {
-        enemy1 = AnimationSet:new(),
-        player1 = AnimationSet:new()
-    }
-    --]]
 
-    local characterSheet = love.graphics.newImage("Assets/miniplayer.png")
-    local grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
+    ASSETS["character"] = {
+        sheet = love.graphics.newImage("Assets/miniplayer.png"),
+        grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
+    }
 
     local charbox = {width = STD_CHR_WIDTH, height = STD_CHR_HEIGHT}
---[[
-    ANIMATION_ASSETS.player1:addNewState("idle",  { characterSheet, charbox, grids["player1"]["idle"], 0.5 })
-    ANIMATION_ASSETS.player1:addNewState("walk",  { characterSheet, charbox, grids["player1"]["walk"], 0.1 })
-    ANIMATION_ASSETS.player1:addNewState("punch", { characterSheet, charbox, grids["player1"]["punch"], 0.1 })
-    ANIMATION_ASSETS.player1:addNewState("kick",  { characterSheet, charbox, grids["player1"]["kick"], 0.1 })
-    ANIMATION_ASSETS.player1:addNewState("death", { characterSheet, charbox, grids["player1"]["death"], 0.1, "pauseAtEnd" })
-    ANIMATION_ASSETS.player1:addNewState("stun",  { characterSheet, charbox, grids["player1"]["stun"], 0.1})
 
-    ANIMATION_ASSETS.enemy1:addNewState("idle",  { characterSheet, charbox, grids["enemy1"]["idle"], 0.5 })
-    ANIMATION_ASSETS.enemy1:addNewState("walk",  { characterSheet, charbox, grids["enemy1"]["walk"], 0.1 })
-    ANIMATION_ASSETS.enemy1:addNewState("punch", { characterSheet, charbox, grids["enemy1"]["punch"], 0.1 })
-    ANIMATION_ASSETS.enemy1:addNewState("kick",  { characterSheet, charbox, grids["enemy1"]["kick"], 0.1 })
-    ANIMATION_ASSETS.enemy1:addNewState("death", { characterSheet, charbox, grids["enemy1"]["death"], 0.1, "pauseAtEnd" })
-    ANIMATION_ASSETS.enemy1:addNewState("stun",  { characterSheet, charbox, grids["enemy1"]["stun"], 0.1})
---]]
     local p1 = PlayerChar:new {
         width = STD_CHR_WIDTH,
         height = STD_CHR_HEIGHT,
         x = 100,
         y = SCREEN_VALUES.height * 0.65,
-        animations = AnimationSet:new(characterSheet, charbox)
+        animations = AnimationSet:new(ASSETS["character"].sheet, charbox)
     }
 
-    p1.animations:addNewState("idle", grids["player1"]["idle"], 0.5)
-    p1.animations:addNewState("walk", grids["player1"]["walk"], 0.1)
-    p1.animations:addNewState("punch", grids["player1"]["punch"], 0.1)
-    p1.animations:addNewState("kick", grids["player1"]["kick"], 0.1)
-    p1.animations:addNewState("death", grids["player1"]["death"], 0.1, "pauseAtEnd")
-    p1.animations:addNewState("stun", grids["player1"]["stun"], 0.1)
+    p1.animations:addNewState("idle", ASSETS["character"].grids["player1"]["idle"], 0.5)
+    p1.animations:addNewState("walk", ASSETS["character"].grids["player1"]["walk"], 0.1)
+    p1.animations:addNewState("punch", ASSETS["character"].grids["player1"]["punch"], 0.1)
+    p1.animations:addNewState("kick", ASSETS["character"].grids["player1"]["kick"], 0.1)
+    p1.animations:addNewState("death", ASSETS["character"].grids["player1"]["death"], 0.1, "pauseAtEnd")
+    p1.animations:addNewState("stun", ASSETS["character"].grids["player1"]["stun"], 0.1)
 
 
     local e1 = PunkChar:new {
@@ -135,15 +121,15 @@ function love.load()
         height = STD_CHR_HEIGHT,
         x = 700,
         y = SCREEN_VALUES.height * 0.7,
-        animations = AnimationSet:new(characterSheet, charbox)
+        animations = AnimationSet:new(ASSETS["character"].sheet, charbox)
     }
 
-    e1.animations:addNewState("idle", grids["enemy1"]["idle"], 0.5)
-    e1.animations:addNewState("walk", grids["enemy1"]["walk"], 0.1)
-    e1.animations:addNewState("punch", grids["enemy1"]["punch"], 0.1)
-    e1.animations:addNewState("kick", grids["enemy1"]["kick"], 0.1)
-    e1.animations:addNewState("death", grids["enemy1"]["death"], 2, "pauseAtEnd")
-    e1.animations:addNewState("stun", grids["enemy1"]["stun"], 0.1)
+    e1.animations:addNewState("idle", ASSETS["character"].grids["enemy1"]["idle"], 0.5)
+    e1.animations:addNewState("walk", ASSETS["character"].grids["enemy1"]["walk"], 0.1)
+    e1.animations:addNewState("punch", ASSETS["character"].grids["enemy1"]["punch"], 0.1)
+    e1.animations:addNewState("kick", ASSETS["character"].grids["enemy1"]["kick"], 0.1)
+    e1.animations:addNewState("death", ASSETS["character"].grids["enemy1"]["death"], 2, "pauseAtEnd")
+    e1.animations:addNewState("stun", ASSETS["character"].grids["enemy1"]["stun"], 0.1)
 
     table.insert(ENTITIES.characters, e1)
     table.insert(ENTITIES.characters, p1)

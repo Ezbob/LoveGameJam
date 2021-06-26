@@ -103,9 +103,6 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
     end
   end
 
-  print(inspect(result))
-
-
   return result
 end
 
