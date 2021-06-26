@@ -13,6 +13,7 @@ function Char:new(o)
   r.animations = r.animations or nil
   r.hitboxes = r.hitboxes or nil
   r.alive = true
+  r.facingRight = true
   r.currentAnimation = r.currentAnimation or 'idle'
   setmetatable(r, self)
   self.__index = self
@@ -29,10 +30,7 @@ function Char:update(dt)
 end
 
 function Char:isFacingRight()
-  local state = self.animations:getState(self.currentAnimation)
-  if state then
-    return state:isFlipped()
-  end
+  return self.facingRight
 end
 
 function Char:faceRight()
@@ -43,6 +41,7 @@ function Char:faceRight()
   local isAnimationFlipped = state.flippedH
   if isAnimationFlipped then
     self.animations:flipAllHorizontal()
+    self.facingRight = true
   end
 end
 
@@ -54,6 +53,7 @@ function Char:faceLeft()
   local isAnimationFlipped = state.flippedH
   if not isAnimationFlipped then
     self.animations:flipAllHorizontal()
+    self.facingRight = false
   end
 end
 

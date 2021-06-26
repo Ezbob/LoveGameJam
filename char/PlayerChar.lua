@@ -171,17 +171,16 @@ function PlayerChar:update(dt)
 
   local nextAnimation = "idle"
   if x ~= y then
+    if x < 0 then
+      self:faceLeft()
+    elseif x > 0 then
+      self:faceRight()
+    end
     nextAnimation = 'walk'
   elseif punch then
     nextAnimation = 'punch'
   elseif kick then
     nextAnimation = 'kick'
-  end
-
-  if x < 0 then
-    self:faceLeft()
-  elseif x > 0 then
-    self:faceRight()
   end
 
   self:setCurrentAnimation(nextAnimation)
