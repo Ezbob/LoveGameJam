@@ -1,5 +1,3 @@
-local Hitbox = require "char.Hitbox"
-
 if DEBUG then
     io.stdout:setvbuf('no')
 end
@@ -12,7 +10,7 @@ local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
 local Camera = require "camera"
-local Animations = require "char.Animation"
+local AnimationSet = require "char.AnimationSet"
 local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
 local PunkChar = require "char.PunkChar"
 
@@ -90,16 +88,18 @@ function love.load()
     IMAGES = {}
     local STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
 
+    --[[
     ANIMATION_ASSETS = {
-        enemy1 = Animations.AnimationStates:new(),
-        player1 = Animations.AnimationStates:new()
+        enemy1 = AnimationSet:new(),
+        player1 = AnimationSet:new()
     }
+    --]]
 
     local characterSheet = love.graphics.newImage("Assets/miniplayer.png")
     local grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
 
     local charbox = {width = STD_CHR_WIDTH, height = STD_CHR_HEIGHT}
-
+--[[
     ANIMATION_ASSETS.player1:addNewState("idle",  { characterSheet, charbox, grids["player1"]["idle"], 0.5 })
     ANIMATION_ASSETS.player1:addNewState("walk",  { characterSheet, charbox, grids["player1"]["walk"], 0.1 })
     ANIMATION_ASSETS.player1:addNewState("punch", { characterSheet, charbox, grids["player1"]["punch"], 0.1 })
@@ -113,22 +113,37 @@ function love.load()
     ANIMATION_ASSETS.enemy1:addNewState("kick",  { characterSheet, charbox, grids["enemy1"]["kick"], 0.1 })
     ANIMATION_ASSETS.enemy1:addNewState("death", { characterSheet, charbox, grids["enemy1"]["death"], 0.1, "pauseAtEnd" })
     ANIMATION_ASSETS.enemy1:addNewState("stun",  { characterSheet, charbox, grids["enemy1"]["stun"], 0.1})
-
+--]]
     local p1 = PlayerChar:new {
         width = STD_CHR_WIDTH,
         height = STD_CHR_HEIGHT,
         x = 100,
         y = SCREEN_VALUES.height * 0.65,
-        animations = ANIMATION_ASSETS.player1
+        animations = AnimationSet:new(characterSheet, charbox)
     }
+
+    p1.animations:addNewState("idle", grids["player1"]["idle"], 0.5)
+    p1.animations:addNewState("walk", grids["player1"]["walk"], 0.1)
+    p1.animations:addNewState("punch", grids["player1"]["punch"], 0.1)
+    p1.animations:addNewState("kick", grids["player1"]["kick"], 0.1)
+    p1.animations:addNewState("death", grids["player1"]["death"], 0.1, "pauseAtEnd")
+    p1.animations:addNewState("stun", grids["player1"]["stun"], 0.1)
+
 
     local e1 = PunkChar:new {
         width = STD_CHR_WIDTH,
         height = STD_CHR_HEIGHT,
         x = 700,
         y = SCREEN_VALUES.height * 0.7,
-        animations = ANIMATION_ASSETS.enemy1
+        animations = AnimationSet:new(characterSheet, charbox)
     }
+
+    e1.animations:addNewState("idle", grids["enemy1"]["idle"], 0.5)
+    e1.animations:addNewState("walk", grids["enemy1"]["walk"], 0.1)
+    e1.animations:addNewState("punch", grids["enemy1"]["punch"], 0.1)
+    e1.animations:addNewState("kick", grids["enemy1"]["kick"], 0.1)
+    e1.animations:addNewState("death", grids["enemy1"]["death"], 2, "pauseAtEnd")
+    e1.animations:addNewState("stun", grids["enemy1"]["stun"], 0.1)
 
     table.insert(ENTITIES.characters, e1)
     table.insert(ENTITIES.characters, p1)
@@ -136,16 +151,19 @@ function love.load()
     table.insert(ENTITIES.enemies, e1)
 
     for i, c in ipairs(ENTITIES.characters) do
-        c.animations:setCurrentAnimation("idle")
+        c:setCurrentAnimation("idle")
     end
 
     for i, e in ipairs(ENTITIES.enemies) do
-        e.animations:getCurrentAnimation():flipHorizontal()
+        e:flipHorizontal()
     end
 
     if HAS_JOYSTICKS then
         ENTITIES.players[1].control_scheme = enums.control_schemes.controller
     end
+
+    Score:setupTimer(0)
+    Score:setupScoreCount(0)
 
     --[[
     STD_CHR_WIDTH, STD_CHR_HEIGHT = 76, 104
@@ -307,28 +325,12 @@ function love.load()
 end
 
 function INIT_WORLD(WORLD)
-    local bbox_width, bbox_height
-    --[[
-    for i = 1, #ENTITIES.players, 1 do
-        local player = ENTITIES.players[i]
-        player.name = "player" .. i
 
-        bbox_width, bbox_height = player:getBboxDimensions()
-        WORLD:add( player, player.x, player.y, bbox_width, bbox_height)
-        player:setKickBox(26, 20) -- Set the width and height of the punch kick boxes
-        player:setPunchBox(22, 16)
+    for i, c in ipairs(ENTITIES.characters) do
+        c.name = ("%s%i"):format(c.type, i)
+        WORLD:add(c, c.x, c.y, c.width, c.height)
     end
 
-    for i = 1, #ENTITIES.enemies, 1 do
-        local enemy = ENTITIES.enemies[i]
-
-        bbox_width, bbox_height = enemy:getBboxDimensions()
-        enemy.name = "enemy" .. enemy.kind .. i
-        WORLD:add( enemy, enemy.x, enemy.y, bbox_width, bbox_height)
-        enemy:setKickBox(26, 20)
-        enemy:setPunchBox(22, 16)
-    end
---]]
     for i = 0, 275, 1 do
         table.insert(ENTITIES.road.planks_top, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94 - 64, width = 64, height = 64 })
         table.insert(ENTITIES.road.planks,  Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94, width = 64, height = 64 })
@@ -338,13 +340,12 @@ function INIT_WORLD(WORLD)
         table.insert(ENTITIES.road.STREET, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64, width = 64, height = 64 })
         table.insert(ENTITIES.road.STREET_LINES, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64 * 3, width = 64, height = 64 })
     end
---[[
-    WORLD:add( { name = "left bounding box"}, 5, 0, 1, SCREEN_VALUES.height)
-    WORLD:add( { name = "top bounding box"}, 5, SCREEN_VALUES.height * (2/5), SCREEN_VALUES.width * 10, 1)
-    WORLD:add( { name = "bottom bounding box"}, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
-    WORLD:add( { name = "right bounding box"}, SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
---]]
-    --WORLD:add( { name = "1st left barricade"}, 5, 500, 64, 64)
+
+    WORLD:add( { name = "left bounding box" }, 5, 0, 1, SCREEN_VALUES.height)
+    WORLD:add( { name = "top bounding box" }, 5, SCREEN_VALUES.height * (2/5), SCREEN_VALUES.width * 10, 1)
+    WORLD:add( { name = "bottom bounding box" }, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
+    WORLD:add( { name = "right bounding box" }, SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
+
     table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 - (64 * 2), width = 64, height = 64 })
     table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 - 64, width = 64, height = 64 })
     table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500, width = 64, height = 64 })
@@ -380,12 +381,29 @@ function love.update(dt)
         ( HAS_JOYSTICKS and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
         love.event.quit();
     end
-
+--[[
+    local isAnyAlive = true
+    for i, p in ipairs(ENTITIES.players) do
+        isAnyAlive = isAnyAlive and p:isAlive();
+    end
+    if not isAnyAlive then
+        GAME_OVER = true
+        GAMEOVER_COLORS.G = math.max(GAMEOVER_COLORS.G - dt * 148, 0)
+        GAMEOVER_COLORS.B = math.max(GAMEOVER_COLORS.B - dt * 148, 0)
+    end
+--]]
     for i, c in ipairs(ENTITIES.characters) do
         c:update(dt)
     end
-    
---    ENTITIES.players[1].animation:update(dt)
+
+    if not GAME_OVER then
+        Score:updateTimer(dt)
+    end
+
+    Timer.update(dt)
+
+
+    --    ENTITIES.players[1].animation:update(dt)
 
     --[[
     if not GAME_OVER then
@@ -445,8 +463,7 @@ function love.update(dt)
     end
 
     if GAME_OVER then
-        GAMEOVER_COLORS.G = math.max(GAMEOVER_COLORS.G - dt * 148, 0)
-        GAMEOVER_COLORS.B = math.max(GAMEOVER_COLORS.B - dt * 148, 0)
+
     end
 
     AI:update(dt, Score, Timer)
@@ -457,8 +474,8 @@ function love.draw()
 
     --love.graphics.scale(SCALE.H, SCALE.V)
 
-    --[[
-    Score:drawTimer()
+
+        --[[
     Score:drawScoreCount()
     --]]
     -- Draw each animation and object within the frame
@@ -478,6 +495,8 @@ function love.draw()
     end
 --]]
 
+
+    Score:drawTimer()
 
     --- background ---
 

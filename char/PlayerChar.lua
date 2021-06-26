@@ -17,5 +17,10 @@ function PlayerChar:new(o)
   return r
 end
 
+function PlayerChar:die()
+  Char.die(self)
+  self:setCurrentAnimation('death')
+end
+
 
 return PlayerChar

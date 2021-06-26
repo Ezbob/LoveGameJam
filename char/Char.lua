@@ -1,28 +1,28 @@
 local Rectangle = require "rectangle"
 local Hitbox = require "char.Hitbox"
+local inspect = require "modules.inspect.inspect"
 
-local Char = Rectangle:new({
+local Char = Rectangle:new {
   type = "char",
-  health = 100,
-  movement_speed = 0,
-  effects = {
-    stunned = false
-  },
-  animations = nil,
-  hitboxes = nil
-})
+}
 
-function  Char:new(o)
+function Char:new(o)
   local r = o or {}
+  r.effects = r.effects or { stunned = false }
+  r.health = r.health or 100
+  r.movement_speed = r.movement_speed or 0
   r.animations = r.animations or {}
   r.hitboxes = r.hitboxes or {}
+  r.alive = true
+  r.currentAnimation = r.currentAnimation or 'idle'
   setmetatable(r, self)
   self.__index = self
   return r
 end
 
 function Char:update(dt)
-  self.animations:getCurrentAnimation():update(dt)
+  self.animations:updateState(self.currentAnimation, dt)
+
   for key, hitbox in pairs(self.hitboxes) do
     hitbox.x = self.x + hitbox.offset_x
     hitbox.y = self.y + hitbox.offset_y
@@ -30,15 +30,27 @@ function Char:update(dt)
 end
 
 function Char:draw()
-  self.animations:getCurrentAnimation():drawAt(self.x, self.y)
+  self.animations:drawState(self.currentAnimation, self.x, self.y)
+end
+
+function Char:setCurrentAnimation(name)
+  if name ~= nil then
+    self.currentAnimation = name
+  end
 end
 
 function Char:flipHorizontal()
-  self.animations:getCurrentAnimation():flipH()
+  local state = self.animations:getState(self.currentAnimation)
+  if state then
+    state:flipH()
+  end
 end
 
 function Char:flipVertical()
-  self.animations:getCurrentAnimation():flipV()
+  local state = self.animations:getState(self.currentAnimation)
+  if state then
+    state:flipV()
+  end
 end
 
 function Char:drawDebug(style)
@@ -64,6 +76,14 @@ end
 
 function Char:getHitbox(tag)
   return self.hitboxes[tag]
+end
+
+function Char:isAlive()
+  return self.alive
+end
+
+function Char:die()
+  self.alive = false
 end
 
 return Char

@@ -1,4 +1,4 @@
---local inspect = require "modules.inspect.inspect"
+local inspect = require "modules.inspect.inspect"
 local json = require "modules.dkjson.dkjson"
 
 local AsepriteAnim8Adaptor = {}
@@ -13,6 +13,7 @@ local function loadJson(filename)
   return json.decode(str)
 end
 
+-- splitting string using gmatch separator
 local function split(inputstr, sep)
   if sep == nil then
           sep = "%s"
@@ -31,6 +32,33 @@ local function defaultLabelSplitter(label)
   return splitit[2], splitit[3]
 end
 
+-- ordering pairs iterator
+local function spairs(t, order)
+  -- collect the keys
+  local keys = {}
+  for k in pairs(t) do keys[#keys+1] = k end
+
+  -- if order function given, sort by it by passing the table and keys a, b,
+  -- otherwise just sort the keys 
+  if order then
+      table.sort(keys, function(a,b) return order(t, a, b) end)
+  else
+      table.sort(keys)
+  end
+
+  -- return the iterator function
+  local i = 0
+  return function()
+      i = i + 1
+      if keys[i] then
+          return keys[i], t[keys[i]]
+      end
+  end
+end
+
+-- Getting ordering animation grids from aseprite JSON
+-- The default label splitter uses {title}-{layer}-{frame} item filename
+-- This can be customized with by parsing a function that returns layer name and frame index
 function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
   local json_data_ = loadJson(filepath)
 
@@ -47,7 +75,11 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
   end
 
   local result = {}
-  for key, value in pairs(json_data_["frames"]) do
+  for key, value in spairs(json_data_["frames"], function (t, a, b)
+    local _, frameIndex1 = labelSplitter(a)
+    local _, frameIndex2 = labelSplitter(b)
+    return tonumber(frameIndex1) < tonumber(frameIndex2)
+  end) do
 
     local entityName, frameIndex = labelSplitter(key)
 
@@ -70,6 +102,9 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
       end
     end
   end
+
+  print(inspect(result))
+
 
   return result
 end
