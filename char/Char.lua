@@ -13,7 +13,6 @@ function Char:new(o)
   r.animations = r.animations or nil
   r.hitboxes = r.hitboxes or nil
   r.alive = true
-  r.facingRight = true
   r.currentAnimation = r.currentAnimation or 'idle'
   setmetatable(r, self)
   self.__index = self
@@ -51,7 +50,6 @@ function Char:flipHorizontal()
   if state then
     state:flipH()
   end
-  self.facingRight = not self.facingRight
 end
 
 function Char:flipVertical()
