@@ -110,8 +110,6 @@ function love.load()
         "player2"
     )
 
-    print(inspect(p2))
-
     local e1 = PunkChar:newPunk(
         700,
         SCREEN_VALUES.height * 0.7

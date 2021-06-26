@@ -168,6 +168,10 @@ function PlayerChar:update(dt)
   if x == y and x == 0 then
     self:setCurrentAnimation('idle')
   else
+    if (x < 0 and self:isFacingRight()) or (x > 0 and not self:isFacingRight()) then
+      self:flipHorizontal()
+    end
+
     self:setCurrentAnimation('walk')
   end
 end

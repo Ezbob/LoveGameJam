@@ -10,10 +10,10 @@ function Char:new(o)
   local r = o or {}
   r.effects = r.effects or nil
   r.health = r.health or 100
-  r.movement_speed = r.movement_speed or 0
   r.animations = r.animations or nil
   r.hitboxes = r.hitboxes or nil
   r.alive = true
+  r.facingRight = true
   r.currentAnimation = r.currentAnimation or 'idle'
   setmetatable(r, self)
   self.__index = self
@@ -26,6 +26,13 @@ function Char:update(dt)
   for _, hitbox in pairs(self.hitboxes) do
     hitbox.x = self.x + hitbox.offset_x
     hitbox.y = self.y + hitbox.offset_y
+  end
+end
+
+function Char:isFacingRight()
+  local state = self.animations:getState(self.currentAnimation)
+  if state then
+    return not state.flippedH
   end
 end
 
@@ -44,6 +51,7 @@ function Char:flipHorizontal()
   if state then
     state:flipH()
   end
+  self.facingRight = not self.facingRight
 end
 
 function Char:flipVertical()
