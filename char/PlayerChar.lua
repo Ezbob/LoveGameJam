@@ -9,6 +9,8 @@ function PlayerChar:new(o)
   setmetatable(r, self)
   self.__index = self
 
+  self.animationTimeout = 0
+
   r:addHitbox("body", 25, 50, 25, 50)
   r:addHitbox("punch_right", 55, 54, 24, 20)
   r:addHitbox("punch_left", -3, 54, 24, 20)
@@ -165,6 +167,14 @@ function PlayerChar:update(dt)
     control = update_as_right
   end
 
+  if self.animationTimeout < love.timer.getTime() then
+    self.animationTimeout = 0
+  end
+
+  if self.animationTimeout ~= 0 then
+    return
+  end
+
   local x, y, punch, kick = control(dt)
 
   self:move(x, y)
@@ -179,8 +189,10 @@ function PlayerChar:update(dt)
     nextAnimation = 'walk'
   elseif punch then
     nextAnimation = 'punch'
+    self.animationTimeout = love.timer.getTime() + 0.5
   elseif kick then
     nextAnimation = 'kick'
+    self.animationTimeout = love.timer.getTime() + 0.4
   end
 
   self:setCurrentAnimation(nextAnimation)

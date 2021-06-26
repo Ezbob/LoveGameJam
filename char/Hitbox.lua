@@ -4,12 +4,12 @@ local Hitbox = Rectangle:new()
 
 function Hitbox:new(o)
   local r = o or {}
+  setmetatable(r, self)
+  self.__index = self
   r.active = r.active or false
   r.type = r.type or nil
   r.offset_x = r.offset_x or 0
   r.offset_y = r.offset_y or 0
-  setmetatable(r, self)
-  self.__index = self
   return r
 end
 
