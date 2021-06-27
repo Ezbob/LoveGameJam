@@ -10,7 +10,6 @@ local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
 local Camera = require "camera"
-local AnimationSet = require "char.AnimationSet"
 local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
 local PunkChar = require "char.PunkChar"
 
@@ -120,12 +119,13 @@ function love.load()
     table.insert(ENTITIES.enemies, e1)
     table.insert(ENTITIES.enemies, e2)
 
-    for _, p in ipairs(ENTITIES.players) do
-        table.insert(ENTITIES.characters, p)
-    end
     for _, p in ipairs(ENTITIES.enemies) do
         table.insert(ENTITIES.characters, p)
         p:flipHorizontal()
+    end
+
+    for _, p in ipairs(ENTITIES.players) do
+        table.insert(ENTITIES.characters, p)
     end
 
     if HAS_JOYSTICKS then
@@ -286,10 +286,6 @@ function love.draw()
 
     --love.graphics.scale(SCALE.H, SCALE.V)
 
-
-        --[[
-    Score:drawScoreCount()
-    --]]
     -- Draw each animation and object within the frame
 
     --[[
@@ -305,12 +301,11 @@ function love.draw()
 
         love.graphics.translate(-x_offset, -y_offset)
     end
-
-    Score:drawTimer()
 --]]
 
-    --- background ---
+    Score:drawTimer()
 
+    --- background ---
 
     local function DrawBackgroundTiles(tiles, cameraRect, texture, quad, offsetX, offsetY, rotation)
         offsetX = offsetX or 0
@@ -335,10 +330,9 @@ function love.draw()
     DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64 * 4)
     DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA_RECTANGLE, STREET, SIDEWALK, 64, 64 * 9, math.pi)
     DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA_RECTANGLE, STREET, GUTTER, 64, 64 * 7, math.pi)
+    DrawBackgroundTiles(ENTITIES.road.barricades, CAMERA_RECTANGLE, OBSTACLES, BARRICADE_QUAD)
 
     --- end of background ---
-
-    DrawBackgroundTiles(ENTITIES.road.barricades, CAMERA_RECTANGLE, OBSTACLES, BARRICADE_QUAD)
 
     for i, c in ipairs(ENTITIES.characters) do
         c:draw()
@@ -360,15 +354,11 @@ function love.draw()
         love.graphics.setFont(old_f)
     end
 
-
     if DEBUG then
         for i, c in ipairs(ENTITIES.characters) do
             c:drawDebug();
         end
-    end
-
     --[[
-    if DEBUG then
         love.graphics.translate(x_offset, y_offset)
         DEBUG_info()
         love.graphics.translate(-x_offset, -y_offset)
@@ -382,9 +372,9 @@ function love.draw()
 
         love.graphics.rectangle("line", ENTITIES.players[1].x + DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
         love.graphics.rectangle("line", ENTITIES.players[1].x + w - DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
-    end
-       --]]
 
+    --]]
+    end
 end
 
 function love.resize(width, height)
