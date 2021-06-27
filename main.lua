@@ -13,6 +13,9 @@ local inspect = require "modules.inspect.inspect"
 local Camera = require "modules.hump.camera"
 local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
 local PunkChar = require "char.PunkChar"
+local Signal = require "modules.hump.signal"
+local Gamestate = require "modules.hump.gamestate"
+local Mainstate = require "gamestates.Mainstate"
 
 IN_FOCUS = false
 DEBUG = true
@@ -39,54 +42,28 @@ love.window.setTitle( "Wrong Neighborhood" )
 
 HAS_JOYSTICKS = #love.joystick.getJoysticks() > 0
 
-
+--[[
+    
 GAMEOVER_COLORS =  {
     G = 255,
     B = 255
 }
+--]]
 
-SCALE = {
-    H = 2,
-    V = 2
+GAMESTATES = {
+    main = Mainstate()
 }
-
-ENTITIES = {
-    characters = {},
-    players = {},
-    enemies = {},
-    objects = {},
-    road = {
-        SIDEWALK = {},
-        STREET = {},
-        STREET_LINES = {},
-        planks = {},
-        planks_top = {},
-        PLANK_AND_SIDEWALK = {},
-        barricades = {},
-        GUTTER = {},
-        flipped_gutter = {}
-    },
-    background = {}
-}
-
-CAMERA = nil
-
-ASSETS = {
-    character = {}
-}
-
-FONT = nil
-
-function love.focus(focus)
-    IN_FOCUS = focus
-end
 
 function love.load()
+    Gamestate.registerEvents()
+    Gamestate.switch(GAMESTATES.main)
     -- Load Textures
+    --[[
     FONT = love.graphics.newFont("Assets/PressStart2P.ttf", DEBUG_FONT_SIZE)
     love.graphics.setFont(FONT)
     WORLD = bump.newWorld()
-    IMAGES = {}
+    SIGNAL = Signal()
+
 
     ASSETS["character"] = {
         sheet = love.graphics.newImage("Assets/miniplayer.png"),
@@ -165,9 +142,10 @@ function love.load()
     STREET_LINES = love.graphics.newQuad(192 + 64 * 3, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
 
     INIT_WORLD(WORLD)
-
+    --]]
 end
 
+--[[
 function INIT_WORLD(WORLD)
 
     for i, c in ipairs(ENTITIES.characters) do
@@ -203,6 +181,7 @@ function INIT_WORLD(WORLD)
     end
 
 end
+--]]
 
 function love.update(dt)
 
@@ -211,6 +190,8 @@ function love.update(dt)
         love.event.quit();
     end
 
+    --[[
+        
     local isAnyAlive = true
     for i, p in ipairs(ENTITIES.players) do
         isAnyAlive = isAnyAlive and p:isAlive();
@@ -234,7 +215,7 @@ function love.update(dt)
     local p1 = ENTITIES.players[1]
 
     CAMERA:lookAt(p1.x, p1.y)
-
+--]]
 --[[
     -- For each player update
     for i, player in ipairs(ENTITIES.players) do
@@ -294,6 +275,7 @@ function love.update(dt)
 end
 
 function love.draw()
+    --[[
     CAMERA:attach()
 
     local function DrawBackgroundTiles(tiles, cameraRect, texture, quad, offsetX, offsetY, rotation)
@@ -326,12 +308,13 @@ function love.draw()
     for i, c in ipairs(ENTITIES.characters) do
         c:draw()
     end
-
+--]]
+ --[[
     if DEBUG then
         for i, c in ipairs(ENTITIES.characters) do
             c:drawDebug();
         end
-    --[[
+
         love.graphics.translate(x_offset, y_offset)
         DEBUG_info()
         love.graphics.translate(-x_offset, -y_offset)
@@ -346,10 +329,9 @@ function love.draw()
         love.graphics.rectangle("line", ENTITIES.players[1].x + DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
         love.graphics.rectangle("line", ENTITIES.players[1].x + w - DETECTION_ZONE_WIDTH, 0, 1, SCREEN_VALUES.height )
 
-    --]]
+
     end
     CAMERA:detach()
-
     Score:drawTimer()
 
     if GAME_OVER then
@@ -365,13 +347,11 @@ function love.draw()
 
         love.graphics.setFont(old_f)
     end
+    --]]
+
 end
 
-function love.resize(width, height)
-    SCALE.H = (width / SCREEN_VALUES.width) * 2
-    SCALE.V = (height / SCREEN_VALUES.height) * 2
-end
-
+--[[
 function draw_debuxes()
     local colItems, len = WORLD:getItems()
     for i = 1, len do
@@ -423,3 +403,4 @@ function DEBUG_info()
     love.graphics.printf("player health " .. (ENTITIES.players[1].health), 20, 9 * DEBUG_FONT_SIZE, 1000, "left")
     love.graphics.printf("enemy health " .. (ENTITIES.enemies[1].health), 20, 10 * DEBUG_FONT_SIZE, 1000, "left")
 end
+--]]
