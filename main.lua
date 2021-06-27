@@ -183,28 +183,13 @@ function INIT_WORLD(WORLD)
     WORLD:add( { name = "bottom bounding box" }, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
     WORLD:add( { name = "right bounding box" }, SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
 
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 - (64 * 2), 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 - 64, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 , 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 2, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 3, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 4, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 5, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 6, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 7, 64, 64 ))
+    for i = 0, 11, 1 do
+        table.insert(ENTITIES.road.barricades, Rectangle( 5, 372 + (64 * i), 64, 64 ))
+    end
 
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 - (64 * 2), 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 - 64, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 , 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 2, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 3 , 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 4, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 5, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 6, 64, 64 ))
-    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 7, 64, 64 ))
-
+    for i = 0, 11, 1 do
+        table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 372 + (64 * i), 64, 64 ))
+    end
 
     for i, rect in ipairs(ENTITIES.road.barricades) do
         WORLD:add( { name = string.format("%d barricade", i) }, rect.x, rect.y, rect.width, rect.height)
