@@ -206,6 +206,8 @@ end
 
 function love.update(dt)
 
+    CAMERA:rotate(dt * 0.5 * math.pi)
+
     if love.keyboard.isDown("escape") or
         ( HAS_JOYSTICKS and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
         love.event.quit();
