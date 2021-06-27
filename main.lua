@@ -11,7 +11,7 @@ local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
 local Camera = require "modules.hump.camera"
-local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
+local AsepriteMetaParser = require "char.AsepriteMetaParser"
 local PunkChar = require "char.PunkChar"
 local Signal = require "modules.hump.signal"
 local Gamestate = require "modules.hump.gamestate"
@@ -55,6 +55,7 @@ GAMESTATES = {
 }
 
 function love.load()
+
     Gamestate.registerEvents()
     Gamestate.switch(GAMESTATES.main)
     -- Load Textures
@@ -67,7 +68,7 @@ function love.load()
 
     ASSETS["character"] = {
         sheet = love.graphics.newImage("Assets/miniplayer.png"),
-        grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
+        grids = AsepriteMetaParser.getGridsFromJSON("Assets/miniplayer.json")
     }
 
     local p1 = PlayerChar(

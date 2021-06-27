@@ -1,7 +1,7 @@
 local inspect = require "modules.inspect.inspect"
 local json = require "modules.dkjson.dkjson"
 
-local AsepriteAnim8Adaptor = {}
+local AsepriteMetaParser = {}
 
 local function loadJson(filename)
   local file = io.open(filename, "r")
@@ -56,14 +56,11 @@ local function spairs(t, order)
   end
 end
 
--- Getting ordering animation grids from aseprite JSON
--- The default label splitter uses {title}-{layer}-{frame} item filename
--- This can be customized with by parsing a function that returns layer name and frame index
-function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
+local function parser(filepath, outputHandler, labelSplitter)
   local json_data_ = loadJson(filepath)
-
   labelSplitter = labelSplitter or defaultLabelSplitter
 
+  local imageSizes = {width = 0, height = 0}
   local frames = {}
 
   for i, entry in ipairs(json_data_['meta']['frameTags']) do
@@ -74,7 +71,9 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
     }
   end
 
-  local result = {}
+  imageSizes.width = json_data_['meta'].size.w
+  imageSizes.height = json_data_['meta'].size.h
+
   for key, value in spairs(json_data_["frames"], function (t, a, b)
     local _, frameIndex1 = labelSplitter(a)
     local _, frameIndex2 = labelSplitter(b)
@@ -83,27 +82,65 @@ function AsepriteAnim8Adaptor.getGridsFromJSON(filepath, labelSplitter)
 
     local entityName, frameIndex = labelSplitter(key)
 
-    local column = (value["frame"]["x"] / value["sourceSize"]["w"]) + 1
-    local row = (value["frame"]["y"] / value["sourceSize"]["h"]) + 1
-
-
-    if result[entityName] == nil then
-      result[entityName] = {}
-    end
-
     frameIndex = tonumber(frameIndex)
     for frameName, frameEntry in pairs(frames) do
       if frameEntry['fromIndex'] <= frameIndex and frameIndex <= frameEntry['toIndex'] then
-        if result[entityName][frameName] == nil then
-          result[entityName][frameName] = {}
-        end
-        table.insert(result[entityName][frameName], column)
-        table.insert(result[entityName][frameName], row)
+        outputHandler(entityName, frameName, frameIndex, value, key, imageSizes)
       end
     end
   end
 
+end
+
+-- Getting ordering animation grids from aseprite JSON
+-- The default label splitter uses {title}-{layer}-{frame} item filename
+-- This can be customized with by parsing a function that returns layer name and frame index
+function AsepriteMetaParser.getGridsFromJSON(filepath, labelSplitter)
+  local result = {}
+
+  parser(filepath, function (entityName, frameName, frameIndex, value)
+
+    local column = (value["frame"]["x"] / value["sourceSize"]["w"]) + 1
+    local row = (value["frame"]["y"] / value["sourceSize"]["h"]) + 1
+
+    if result[entityName] == nil then
+      result[entityName] = {}
+    end
+    if result[entityName][frameName] == nil then
+      result[entityName][frameName] = {}
+    end
+    table.insert(result[entityName][frameName], column)
+    table.insert(result[entityName][frameName], row)
+  end, labelSplitter)
+
   return result
 end
 
-return AsepriteAnim8Adaptor
+function AsepriteMetaParser.getQuadsFromJSON(filepath, labelSplitter)
+  local result = {}
+
+  parser(filepath, function (entityName, frameName, frameIndex, value, key, imageSizes)
+
+    local column = value["frame"]["x"]
+    local row = value["frame"]["y"]
+    local width = value["frame"]["w"]
+    local height = value["frame"]["h"]
+
+    if result[entityName] == nil then
+      result[entityName] = {}
+    end
+    if entityName ~= frameName then
+      if result[entityName][frameName] == nil then
+        result[entityName][frameName] = {}
+      end
+      table.insert(result[entityName][frameName], love.graphics.newQuad(column, row, width, height, imageSizes.width, imageSizes.height))
+    else
+      result[entityName] = love.graphics.newQuad(column, row, width, height, imageSizes.width, imageSizes.height)
+    end
+
+  end, labelSplitter)
+
+  return result
+end
+
+return AsepriteMetaParser
