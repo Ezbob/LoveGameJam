@@ -25,6 +25,8 @@ DETECTION_ZONE_WIDTH = 200
 DEBUG_FONT_SIZE = 16
 GAME_OVER = false
 
+love.graphics.setDefaultFilter('nearest')
+
 love.window.setMode( SCREEN_VALUES.width, SCREEN_VALUES.height, {
     resizable = true,
     vsync = true,

@@ -28,8 +28,8 @@ function PlayerChar:init(id, x, y, animationTag, width, height, collision, sheet
 
   self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
   self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)
-  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1)
-  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1)
+  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1, "pauseAtEnd")
+  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1, "pauseAtEnd")
   self.animations:addNewState("death", grid[animationTag]["death"], 0.1, "pauseAtEnd")
   self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
 end
@@ -174,9 +174,19 @@ function PlayerChar:update(dt)
   elseif punch then
     nextAnimation = 'punch'
     self.animationTimeout = love.timer.getTime() + 0.5
+    local state = self.animations:getState('punch')
+    if state then
+      state:gotoFrame(1)
+      state:resume()
+    end
   elseif kick then
     nextAnimation = 'kick'
-    self.animationTimeout = love.timer.getTime() + 0.4
+    self.animationTimeout = love.timer.getTime() + 0.5
+    local state = self.animations:getState('kick')
+    if state then
+      state:gotoFrame(1)
+      state:resume()
+    end
   end
 
   self:setCurrentAnimation(nextAnimation)
