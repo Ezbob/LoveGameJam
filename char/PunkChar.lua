@@ -4,15 +4,16 @@ local inspect = require "modules.inspect.inspect"
 
 local PunkChar = Class {
   __includes = Char,
-  type = "punk"
+  type = "punk",
+  name = "punk" -- collision id
 }
 
-function PunkChar:init(x, y, animationTag, width, height, collision, sheet, grid)
+function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width, height)
   width = width or 76
   height = height or 104
-  collision = collision or WORLD
-  sheet = sheet or ASSETS["character"].sheet
-  grid = grid or ASSETS["character"].grids
+  collision = collision
+  sheet = sheet
+  grid = grid
   animationTag = animationTag or "enemy1"
 
   Char.init(self, x, y, width, height, 'idle', sheet)
@@ -35,8 +36,9 @@ function PunkChar:init(x, y, animationTag, width, height, collision, sheet, grid
   self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1)
   self.animations:addNewState("death", grid[animationTag]["death"], 0.1, "pauseAtEnd")
   self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
-end
 
+  self.collision:add(self, self.x, self.y, self.width, self.height)
+end
 
 
 return PunkChar

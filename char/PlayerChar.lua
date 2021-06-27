@@ -1,24 +1,30 @@
 local Char = require "char.Char"
 local Class = require "modules.hump.class"
+local inspect = require "modules.inspect.inspect"
 
 local PlayerChar = Class {
   __includes = Char,
-  type = "player"
+  type = "player",
+  name = "player" -- collision id
 }
 
-function PlayerChar:init(id, x, y, animationTag, width, height, collision, sheet, grid)
+function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid, width, height)
   width = width or 76
   height = height or 104
-  collision = collision or WORLD
-  sheet = sheet or ASSETS["character"].sheet
-  grid = grid or ASSETS["character"].grids
-  animationTag = animationTag or "player1"
+  collision = collision
+  sheet = sheet
+  grid = grid
+  signal = signal
+  animationTag = animationTag
 
   Char.init(self, x, y, width, height, 'idle', sheet)
 
   self.playerId = id
   self.animationTimeout = 0
   self.collision = collision
+  self.signal = signal
+  self.isPunching = false
+  self.isKicking = false
 
   self:addHitbox("body", 25, 50, 25, 50)
   self:addHitbox("punch_right", 62, 56, 12, 12)
@@ -28,10 +34,16 @@ function PlayerChar:init(id, x, y, animationTag, width, height, collision, sheet
 
   self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
   self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)
-  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1, "pauseAtEnd")
-  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1, "pauseAtEnd")
+  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1, function ()
+    self:punchEnd()
+  end)
+  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1, function ()
+    self:kickEnd()
+  end)
   self.animations:addNewState("death", grid[animationTag]["death"], 0.1, "pauseAtEnd")
   self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
+
+  self.collision:add(self, self.x, self.y, self.width, self.height)
 end
 
 function PlayerChar:die()
@@ -51,6 +63,28 @@ function PlayerChar:move(relative_x, relative_y)
   local actualX, actualY, col, len = self.collision:move(self, self.x + relative_x, self.y + relative_y, playerCollisionFilter)
   self.x = actualX
   self.y = actualY
+end
+
+function PlayerChar:punchEnd()
+  self.isPunching = false
+  local hitbox = nil
+  if self:isFacingRight() then
+    hitbox = self.hitboxes['punch_right']
+  else
+    hitbox = self.hitboxes['punch_left']
+  end
+  self.signal:emit('player_punch', self, hitbox)
+end
+
+function PlayerChar:kickEnd()
+  self.isKicking = false
+  local hitbox = nil
+  if self:isFacingRight() then
+    hitbox = self.hitboxes['kick_right']
+  else
+    hitbox = self.hitboxes['kick_left']
+  end
+  self.signal:emit('player_kick', self, hitbox)
 end
 
 local function update_as_left(delta_time)
@@ -154,11 +188,7 @@ function PlayerChar:update(dt)
     control = update_as_right
   end
 
-  if self.animationTimeout < love.timer.getTime() then
-    self.animationTimeout = 0
-  end
-
-  if self.animationTimeout ~= 0 then
+  if self.isPunching or self.isKicking then
     return
   end
 
@@ -174,22 +204,12 @@ function PlayerChar:update(dt)
       self:faceRight()
     end
     nextAnimation = 'walk'
-  elseif punch then
+  elseif punch and not ( self.isPunching or self.isKicking) then
     nextAnimation = 'punch'
-    self.animationTimeout = love.timer.getTime() + 0.5
-    local state = self.animations:getState('punch')
-    if state then
-      state:gotoFrame(1)
-      state:resume()
-    end
-  elseif kick then
+    self.isPunching = true
+  elseif kick and not (self.isKicking or self.isKicking) then
     nextAnimation = 'kick'
-    self.animationTimeout = love.timer.getTime() + 0.5
-    local state = self.animations:getState('kick')
-    if state then
-      state:gotoFrame(1)
-      state:resume()
-    end
+    self.isKicking = true
   end
 
   self:setCurrentAnimation(nextAnimation)

@@ -6,7 +6,8 @@ local AnimationSet = require "char.AnimationSet"
 
 local Char = Class {
   __includes = Rectangle,
-  type = "char"
+  type = "char",
+  name = "char" -- collision id
 }
 
 function Char:init(x, y, w, h, currentAnimation, image)
