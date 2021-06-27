@@ -143,6 +143,9 @@ end
 
 function PlayerChar:update(dt)
   Char.update(self, dt)
+  if not self.alive then
+    return
+  end
 
   local control = nil
   if self.playerId == 1 then

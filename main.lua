@@ -206,8 +206,6 @@ end
 
 function love.update(dt)
 
-    CAMERA:rotate(dt * 0.5 * math.pi)
-
     if love.keyboard.isDown("escape") or
         ( HAS_JOYSTICKS and love.joystick.getJoysticks()[1]:isGamepadDown('guide') ) then
         love.event.quit();
@@ -329,22 +327,6 @@ function love.draw()
         c:draw()
     end
 
-
-    if GAME_OVER then
-
-        local old_f = love.graphics.getFont()
-        love.graphics.setColor(255, GAMEOVER_COLORS.G, GAMEOVER_COLORS.B, 255)
-        local f = love.graphics.newFont("Assets/PressStart2P.ttf", 75)
-        love.graphics.setFont(f)
-
-        local text_length = f:getWidth("Game Over")
-        local position = { x = CAMERA.width / 2 - text_length, y = CAMERA.height / 2 - 75 }
-
-        love.graphics.print("Game Over", position.x, position.y)
-
-        love.graphics.setFont(old_f)
-    end
-
     if DEBUG then
         for i, c in ipairs(ENTITIES.characters) do
             c:drawDebug();
@@ -370,6 +352,19 @@ function love.draw()
 
     Score:drawTimer()
 
+    if GAME_OVER then
+        local old_f = love.graphics.getFont()
+        love.graphics.setColor(255, GAMEOVER_COLORS.G, GAMEOVER_COLORS.B, 255)
+        local f = love.graphics.newFont("Assets/PressStart2P.ttf", 75)
+        love.graphics.setFont(f)
+
+        local text_length = f:getWidth("Game Over")
+        local position = { x = SCREEN_VALUES.width / 2 - text_length / 2, y = SCREEN_VALUES.height / 2 - 75 / 2 }
+
+        love.graphics.print("Game Over", position.x, position.y)
+
+        love.graphics.setFont(old_f)
+    end
 end
 
 function love.resize(width, height)
