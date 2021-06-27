@@ -1,6 +1,7 @@
 
 local anim8 = require "modules.anim8.anim8"
 local inspect = require "modules.inspect.inspect"
+local Class = require "modules.hump.class"
 
 -- Animation: Encapsulates a anim8 resouce, grid and animation
 
@@ -15,16 +16,11 @@ end
 
 -- Animation state machine
 
-local AnimationSet = {}
+local AnimationSet = Class {}
 
-function AnimationSet:new(image, box)
-  local r = {
-    sheet = newSheet(image, box),
-    set = {}
-  }
-  setmetatable(r, self)
-  self.__index = self
-  return r
+function AnimationSet:init(image, box)
+  self.sheet = newSheet(image, box)
+  self.set = {}
 end
 
 function AnimationSet:addNewState(name, frameSlices, duration, onLoop)

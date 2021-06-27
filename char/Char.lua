@@ -1,23 +1,20 @@
 local Rectangle = require "rectangle"
 local Hitbox = require "char.Hitbox"
 local inspect = require "modules.inspect.inspect"
+local Class = require "modules.hump.class"
+local AnimationSet = require "char.AnimationSet"
 
-local Char = Rectangle:new {
-  type = "char",
+local Char = Class {
+  __includes = Rectangle,
+  type = "char"
 }
 
-function Char:new(o)
-  local r = o or {}
-  r.effects = r.effects or nil
-  r.health = r.health or 100
-  r.animations = r.animations or nil
-  r.hitboxes = r.hitboxes or nil
-  r.alive = true
-  r.facingRight = true
-  r.currentAnimation = r.currentAnimation or 'idle'
-  setmetatable(r, self)
-  self.__index = self
-  return r
+function Char:init(x, y, w, h, currentAnimation, image)
+  Rectangle.init(self, x, y, w, h)
+  self.animations = AnimationSet(image, {width = self.width, height = self.height})
+  self.alive = true
+  self.facingRight = true
+  self.currentAnimation = currentAnimation or 'idle'
 end
 
 function Char:update(dt)
@@ -92,13 +89,7 @@ function Char:addHitbox(tag, x_offset, y_offset, width, height)
   if self.hitboxes == nil then
     self.hitboxes = {}
   end
-  self.hitboxes[tag] = Hitbox:new({
-    type = tag,
-    offset_x = x_offset,
-    offset_y = y_offset,
-    width = width,
-    height = height
-  })
+  self.hitboxes[tag] = Hitbox(tag, x_offset, y_offset, width, height)
 end
 
 function Char:removeHitbox(tag)

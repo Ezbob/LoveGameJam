@@ -67,12 +67,7 @@ ENTITIES = {
     background = {}
 }
 
-CAMERA_RECTANGLE = Camera:new {
-    x = 0,
-    y = 0,
-    width = SCREEN_VALUES.width,
-    height = SCREEN_VALUES.height
-}
+CAMERA_RECTANGLE = Camera(0, 0, SCREEN_VALUES.width, SCREEN_VALUES.height)
 
 ASSETS = {
     character = {}
@@ -96,26 +91,26 @@ function love.load()
         grids = AsepriteAnim8Adaptor.getGridsFromJSON("Assets/miniplayer.json")
     }
 
-    local p1 = PlayerChar:newPlayer(
+    local p1 = PlayerChar(
         1,
         100,
         SCREEN_VALUES.height * 0.65,
         "player1"
     )
 
-    local p2 = PlayerChar:newPlayer(
+    local p2 = PlayerChar(
         2,
         100,
         SCREEN_VALUES.height * 0.55,
         "player2"
     )
 
-    local e1 = PunkChar:newPunk(
+    local e1 = PunkChar(
         700,
         SCREEN_VALUES.height * 0.7
     )
 
-    local e2 = PunkChar:newPunk(
+    local e2 = PunkChar(
         800,
         SCREEN_VALUES.height * 0.62
     )
@@ -130,14 +125,7 @@ function love.load()
     end
     for _, p in ipairs(ENTITIES.enemies) do
         table.insert(ENTITIES.characters, p)
-    end
-
-    for _, c in ipairs(ENTITIES.characters) do
-        c:setCurrentAnimation("idle")
-    end
-
-    for _, e in ipairs(ENTITIES.enemies) do
-        e:flipHorizontal()
+        p:flipHorizontal()
     end
 
     if HAS_JOYSTICKS then
@@ -170,6 +158,7 @@ function love.load()
     STREET_LINES = love.graphics.newQuad(192 + 64 * 3, 0, 64, 64, STREET:getWidth(), STREET:getHeight())
 
     INIT_WORLD(WORLD)
+
 end
 
 function INIT_WORLD(WORLD)
@@ -180,13 +169,13 @@ function INIT_WORLD(WORLD)
     end
 
     for i = 0, 275, 1 do
-        table.insert(ENTITIES.road.planks_top, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94 - 64, width = 64, height = 64 })
-        table.insert(ENTITIES.road.planks,  Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 94, width = 64, height = 64 })
-        table.insert(ENTITIES.road.PLANK_AND_SIDEWALK, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) - 30, width = 64, height = 64 })
-        table.insert(ENTITIES.road.SIDEWALK, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 34, width = 64, height = 64 })
-        table.insert(ENTITIES.road.GUTTER, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98, width = 64, height = 64 })
-        table.insert(ENTITIES.road.STREET, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64, width = 64, height = 64 })
-        table.insert(ENTITIES.road.STREET_LINES, Rectangle:new { x = i * 58, y = SCREEN_VALUES.height * (2/5) + 98 + 64 * 3, width = 64, height = 64 })
+        table.insert(ENTITIES.road.planks_top, Rectangle( i * 58, SCREEN_VALUES.height * (2/5) - 94 - 64, 64, 64 ))
+        table.insert(ENTITIES.road.planks,  Rectangle( i * 58, SCREEN_VALUES.height * (2/5) - 94, 64, 64 ))
+        table.insert(ENTITIES.road.PLANK_AND_SIDEWALK, Rectangle( i * 58, SCREEN_VALUES.height * (2/5) - 30, 64, 64 ))
+        table.insert(ENTITIES.road.SIDEWALK, Rectangle( i * 58, SCREEN_VALUES.height * (2/5) + 34, 64, 64 ))
+        table.insert(ENTITIES.road.GUTTER, Rectangle( i * 58, SCREEN_VALUES.height * (2/5) + 98, 64, 64 ))
+        table.insert(ENTITIES.road.STREET, Rectangle( i * 58, SCREEN_VALUES.height * (2/5) + 98 + 64, 64, 64 ))
+        table.insert(ENTITIES.road.STREET_LINES, Rectangle( i * 58, SCREEN_VALUES.height * (2/5) + 98 + 64 * 3, 64, 64 ))
     end
 
     WORLD:add( { name = "left bounding box" }, 5, 0, 1, SCREEN_VALUES.height)
@@ -194,27 +183,27 @@ function INIT_WORLD(WORLD)
     WORLD:add( { name = "bottom bounding box" }, 5, SCREEN_VALUES.height * 0.9, SCREEN_VALUES.width * 10, 1)
     WORLD:add( { name = "right bounding box" }, SCREEN_VALUES.width * 10, 0, 1, SCREEN_VALUES.height)
 
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 - (64 * 2), width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 - 64, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 , width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 2, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 3, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 4, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 5, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 6, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = 5, y = 500 + 64 * 7, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 - (64 * 2), 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 - 64, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 , 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 2, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 3, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 4, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 5, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 6, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( 5, 500 + 64 * 7, 64, 64 ))
 
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 - (64 * 2), width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 - 64, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 , width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 2, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 3 , width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 4, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 5, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 6, width = 64, height = 64 })
-    table.insert(ENTITIES.road.barricades, Rectangle:new { x = SCREEN_VALUES.width * 10 - (5 + 64), y = 500 + 64 * 7, width = 64, height = 64 })
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 - (64 * 2), 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 - 64, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 , 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 2, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 3 , 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 4, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 5, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 6, 64, 64 ))
+    table.insert(ENTITIES.road.barricades, Rectangle( SCREEN_VALUES.width * 10 - (5 + 64), 500 + 64 * 7, 64, 64 ))
 
 
     for i, rect in ipairs(ENTITIES.road.barricades) do
@@ -250,17 +239,7 @@ function love.update(dt)
 
     Timer.update(dt)
 
-
-    --    ENTITIES.players[1].animation:update(dt)
-
-    --[[
-    if not GAME_OVER then
-        Score:updateTimer(dt)
-        Score:updateScoreCount(dt)
-    end
-
-    Timer.update(dt)
-
+--[[
     -- For each player update
     for i, player in ipairs(ENTITIES.players) do
 
@@ -341,10 +320,9 @@ function love.draw()
 
         love.graphics.translate(-x_offset, -y_offset)
     end
---]]
-
 
     Score:drawTimer()
+--]]
 
     --- background ---
 
@@ -381,7 +359,7 @@ function love.draw()
         c:draw()
     end
 
-    --[[
+
     if GAME_OVER then
 
         local old_f = love.graphics.getFont()
@@ -397,12 +375,13 @@ function love.draw()
         love.graphics.setFont(old_f)
     end
 
-    --]]
+
     if DEBUG then
         for i, c in ipairs(ENTITIES.characters) do
             c:drawDebug();
         end
     end
+
     --[[
     if DEBUG then
         love.graphics.translate(x_offset, y_offset)

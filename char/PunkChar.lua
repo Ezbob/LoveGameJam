@@ -1,49 +1,42 @@
 local Char = require "char.Char"
-local AnimationSet = require "char.AnimationSet"
+local Class = require "modules.hump.class"
+local inspect = require "modules.inspect.inspect"
 
-local PunkChar = Char:new()
+local PunkChar = Class {
+  __includes = Char,
+  type = "punk"
+}
 
-function PunkChar:new(o)
-  local r = o or {}
-  r.type = "punk"
-  setmetatable(r, self)
-  self.__index = self
-
-  r:addHitbox("body", 25, 50, 25, 50)
-  r:addHitbox("punch_right", 62, 56, 12, 12)
-  r:addHitbox("punch_left", 2, 56, 12, 12)
-  r:addHitbox("kick_right", 57, 71, 20, 12)
-  r:addHitbox("kick_left", -2, 71, 20, 12)
-  return r
-end
-
-function PunkChar:setupAnimations(sheet, grids, entity)
-  self.animations = AnimationSet:new(sheet, {width = self.width, height = self.height})
-  self.animations:addNewState("idle", grids[entity]["idle"], 0.5)
-  self.animations:addNewState("walk", grids[entity]["walk"], 0.1)
-  self.animations:addNewState("punch", grids[entity]["punch"], 0.1)
-  self.animations:addNewState("kick", grids[entity]["kick"], 0.1)
-  self.animations:addNewState("death", grids[entity]["death"], 0.1, "pauseAtEnd")
-  self.animations:addNewState("stun", grids[entity]["stun"], 0.1)
-end
-
--- Shorthand for creating a new player
-function PunkChar:newPunk(x, y, animationTag, width, height, sheet, grid)
+function PunkChar:init(x, y, animationTag, width, height, collision, sheet, grid)
   width = width or 76
   height = height or 104
+  collision = collision or WORLD
   sheet = sheet or ASSETS["character"].sheet
   grid = grid or ASSETS["character"].grids
   animationTag = animationTag or "enemy1"
 
-  local newChar = PunkChar:new {
-    width = width,
-    height = height,
-    x = x,
-    y = y
-  }
+  Char.init(self, x, y, width, height, 'idle', sheet)
 
-  newChar:setupAnimations(sheet, grid, animationTag)
-  return newChar
+  self.x = x
+  self.y = y
+  self.width = width
+  self.height = height
+  self.collision = collision
+
+  self:addHitbox("body", 25, 50, 25, 50)
+  self:addHitbox("punch_right", 62, 56, 12, 12)
+  self:addHitbox("punch_left", 2, 56, 12, 12)
+  self:addHitbox("kick_right", 57, 71, 20, 12)
+  self:addHitbox("kick_left", -2, 71, 20, 12)
+
+  self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
+  self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)
+  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1)
+  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1)
+  self.animations:addNewState("death", grid[animationTag]["death"], 0.1, "pauseAtEnd")
+  self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
 end
+
+
 
 return PunkChar

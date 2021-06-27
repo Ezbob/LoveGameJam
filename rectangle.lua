@@ -1,16 +1,12 @@
+local Class = require "modules.hump.class"
 
-local Rectangle = {
-  x = 0,
-  y = 0,
-  width = 0,
-  height = 0
-}
+local Rectangle = Class {}
 
-function Rectangle:new(o)
-  local r = o or {}
-  setmetatable(r, self)
-  self.__index = self -- using self here enable inheritance
-  return r
+function Rectangle:init(x, y, w, h)
+  self.x = x
+  self.y = y
+  self.width = w
+  self.height = h
 end
 
 function Rectangle:isIntersectingRectangles(other)
