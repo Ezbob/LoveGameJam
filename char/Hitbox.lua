@@ -1,16 +1,14 @@
 local Rectangle = require "rectangle"
+local Class = require "modules.hump.class"
 
-local Hitbox = Rectangle:new()
+local Hitbox = Class {__includes = Rectangle}
 
-function Hitbox:new(o)
-  local r = o or {}
-  setmetatable(r, self)
-  self.__index = self
-  r.active = r.active or false
-  r.type = r.type or nil
-  r.offset_x = r.offset_x or 0
-  r.offset_y = r.offset_y or 0
-  return r
+function Hitbox:init(tag, offset_x, offset_y, w, h)
+  Rectangle.init(self, 0, 0, w, h)
+  self.name = tag
+  self.active = false
+  self.offset_x = offset_x or 0
+  self.offset_y = offset_y or 0
 end
 
 function Hitbox:isActive()
