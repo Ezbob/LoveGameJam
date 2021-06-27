@@ -164,7 +164,7 @@ function PlayerChar:update(dt)
   self:move(x, y)
 
   local nextAnimation = "idle"
-  if x ~= y then
+  if x ~= 0 or y ~= 0 then
     if x < 0 then
       self:faceLeft()
     elseif x > 0 then

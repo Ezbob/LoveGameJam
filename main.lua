@@ -1,3 +1,4 @@
+local camera = require "camera"
 if DEBUG then
     io.stdout:setvbuf('no')
 end
@@ -9,7 +10,7 @@ local AI = require "ai"
 local Timer = require "./modules/hump/timer"
 local Score = require "scoring"
 local inspect = require "modules.inspect.inspect"
-local Camera = require "camera"
+local Camera = require "modules.hump.camera"
 local AsepriteAnim8Adaptor = require "char.AsepriteAnim8Adaptor"
 local PunkChar = require "char.PunkChar"
 
@@ -28,7 +29,7 @@ love.window.setMode( SCREEN_VALUES.width, SCREEN_VALUES.height, {
     resizable = true,
     vsync = true,
     minwidth = SCREEN_VALUES.width,
-    minheight= SCREEN_VALUES.height,
+    minheight = SCREEN_VALUES.height,
     fullscreen = false
 })
 
@@ -66,7 +67,7 @@ ENTITIES = {
     background = {}
 }
 
-CAMERA_RECTANGLE = Camera(0, 0, SCREEN_VALUES.width, SCREEN_VALUES.height)
+CAMERA = nil
 
 ASSETS = {
     character = {}
@@ -113,6 +114,10 @@ function love.load()
         800,
         SCREEN_VALUES.height * 0.62
     )
+
+    CAMERA = Camera(p1.x + (p1.width / 2), p2.y)
+
+    CAMERA:zoom(2)
 
     table.insert(ENTITIES.players, p1)
     table.insert(ENTITIES.players, p2)
@@ -224,6 +229,10 @@ function love.update(dt)
 
     Timer.update(dt)
 
+    local p1 = ENTITIES.players[1]
+
+    CAMERA:lookAt(p1.x, p1.y)
+
 --[[
     -- For each player update
     for i, player in ipairs(ENTITIES.players) do
@@ -283,54 +292,32 @@ function love.update(dt)
 end
 
 function love.draw()
-
-    --love.graphics.scale(SCALE.H, SCALE.V)
-
-    -- Draw each animation and object within the frame
-
-    --[[
-    local x_offset, y_offset
-    if (locked_camera) then
-
-    else
-        x_offset = (ENTITIES.players[1].x - (SCREEN_VALUES.width / 4))
-        y_offset = SCREEN_VALUES.height / 2
-
-        CAMERA_RECTANGLE.x = x_offset
-        CAMERA_RECTANGLE.y = y_offset
-
-        love.graphics.translate(-x_offset, -y_offset)
-    end
---]]
-
-    Score:drawTimer()
-
-    --- background ---
+    CAMERA:attach()
 
     local function DrawBackgroundTiles(tiles, cameraRect, texture, quad, offsetX, offsetY, rotation)
         offsetX = offsetX or 0
         offsetY = offsetY or 0
         for i, g in ipairs(tiles) do
-            if g:isIntersectingRectangles(cameraRect) then
-                love.graphics.draw(texture, quad, g.x + offsetX, g.y + offsetY, rotation)
-            end
+            --if g:isIntersectingRectangles(cameraRect) then
+            love.graphics.draw(texture, quad, g.x + offsetX, g.y + offsetY, rotation)
+            --end
         end
     end
 
-    DrawBackgroundTiles(ENTITIES.road.planks_top, CAMERA_RECTANGLE, STREET, PLANK_TOP)
-    DrawBackgroundTiles(ENTITIES.road.planks, CAMERA_RECTANGLE, STREET, PLANK)
-    DrawBackgroundTiles(ENTITIES.road.PLANK_AND_SIDEWALK, CAMERA_RECTANGLE, STREET, PLANK_AND_SIDEWALK)
-    DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA_RECTANGLE, STREET, SIDEWALK)
-    DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA_RECTANGLE, STREET, GUTTER)
-    DrawBackgroundTiles(ENTITIES.road.STREET_LINES, CAMERA_RECTANGLE, STREET, STREET_LINES)
+    DrawBackgroundTiles(ENTITIES.road.planks_top, CAMERA, STREET, PLANK_TOP)
+    DrawBackgroundTiles(ENTITIES.road.planks, CAMERA, STREET, PLANK)
+    DrawBackgroundTiles(ENTITIES.road.PLANK_AND_SIDEWALK, CAMERA, STREET, PLANK_AND_SIDEWALK)
+    DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA, STREET, SIDEWALK)
+    DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA, STREET, GUTTER)
+    DrawBackgroundTiles(ENTITIES.road.STREET_LINES, CAMERA, STREET, STREET_LINES)
 
-    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT)
-    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64)
-    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64 * 3)
-    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA_RECTANGLE, STREET, ASPHALT, 0, 64 * 4)
-    DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA_RECTANGLE, STREET, SIDEWALK, 64, 64 * 9, math.pi)
-    DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA_RECTANGLE, STREET, GUTTER, 64, 64 * 7, math.pi)
-    DrawBackgroundTiles(ENTITIES.road.barricades, CAMERA_RECTANGLE, OBSTACLES, BARRICADE_QUAD)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA, STREET, ASPHALT)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA, STREET, ASPHALT, 0, 64)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA, STREET, ASPHALT, 0, 64 * 3)
+    DrawBackgroundTiles(ENTITIES.road.STREET, CAMERA, STREET, ASPHALT, 0, 64 * 4)
+    DrawBackgroundTiles(ENTITIES.road.SIDEWALK, CAMERA, STREET, SIDEWALK, 64, 64 * 9, math.pi)
+    DrawBackgroundTiles(ENTITIES.road.GUTTER, CAMERA, STREET, GUTTER, 64, 64 * 7, math.pi)
+    DrawBackgroundTiles(ENTITIES.road.barricades, CAMERA, OBSTACLES, BARRICADE_QUAD)
 
     --- end of background ---
 
@@ -347,7 +334,7 @@ function love.draw()
         love.graphics.setFont(f)
 
         local text_length = f:getWidth("Game Over")
-        local position = { x = CAMERA_RECTANGLE.width / 2 - text_length, y = CAMERA_RECTANGLE.height / 2 - 75 }
+        local position = { x = CAMERA.width / 2 - text_length, y = CAMERA.height / 2 - 75 }
 
         love.graphics.print("Game Over", position.x, position.y)
 
@@ -375,6 +362,10 @@ function love.draw()
 
     --]]
     end
+    CAMERA:detach()
+
+    Score:drawTimer()
+
 end
 
 function love.resize(width, height)
