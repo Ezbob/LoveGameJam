@@ -22,57 +22,56 @@ function Mainstate:init()
       sheet = love.graphics.newImage("Assets/miniplayer.png"),
       grids = AsepriteMetaParser.getGridsFromJSON("Assets/miniplayer.json")
     },
-    asphalt = {
+    ground = {
       sheet = love.graphics.newImage("Assets/asphalt.png"),
       quads = AsepriteMetaParser.getQuadsFromJSON("Assets/asphalt.json")
+    },
+    obstacles = {
+      sheet = love.graphics.newImage("Assets/obstacles_small.png"),
+      quads = AsepriteMetaParser.getQuadsFromJSON("Assets/obstacles_small.json")
     }
   }
-  self.streetSprites = love.graphics.newSpriteBatch(self.assets.asphalt.sheet)
+  self.streetSprites = love.graphics.newSpriteBatch(self.assets.ground.sheet)
+  self.obstaclesSprites = love.graphics.newSpriteBatch(self.assets.obstacles.sheet)
 end
 
-local function setup_background(assets, streetSprites)
+local function setup_background(assets, streetSprites, obstaclesSprites, screen, collision_world)
 
   local tileSideLength = 64
-  for i = 0, 30, 1 do
-    streetSprites:add(assets.asphalt.quads.plank_top, i * tileSideLength, 0)
-    streetSprites:add(assets.asphalt.quads.planks, i * tileSideLength, tileSideLength)
-    streetSprites:add(assets.asphalt.quads.planks, i * tileSideLength, tileSideLength * 2)
-    streetSprites:add(assets.asphalt.quads.plank_sidewalk, i * tileSideLength, tileSideLength * 3)
-    streetSprites:add(assets.asphalt.quads.sidewalk, i * tileSideLength, tileSideLength * 4)
-    streetSprites:add(assets.asphalt.quads.gutter, i * tileSideLength, tileSideLength * 5)
-    streetSprites:add(assets.asphalt.quads.asphalt, i * tileSideLength, tileSideLength * 6)
-    streetSprites:add(assets.asphalt.quads.asphalt, i * tileSideLength, tileSideLength * 7)
-    streetSprites:add(assets.asphalt.quads.road_stripe, i * tileSideLength, tileSideLength * 8)
-    streetSprites:add(assets.asphalt.quads.asphalt, i * tileSideLength, tileSideLength * 9)
-    streetSprites:add(assets.asphalt.quads.asphalt, i * tileSideLength, tileSideLength * 10)
-    streetSprites:add(assets.asphalt.quads.gutter, i * tileSideLength, tileSideLength * 11, math.pi, 1, 1, tileSideLength, tileSideLength)
-    streetSprites:add(assets.asphalt.quads.sidewalk, i * tileSideLength, tileSideLength * 12, math.pi, 1, 1, tileSideLength, tileSideLength)
+  local lastRow = screen.width * 2
+  local spriteCount = (lastRow / tileSideLength) - 1
+  for i = 0, spriteCount, 1 do
+    local column = i * tileSideLength
+    streetSprites:add(assets.ground.quads.plank_top, column, tileSideLength * 3)
+    streetSprites:add(assets.ground.quads.planks, column, tileSideLength * 4)
+    streetSprites:add(assets.ground.quads.planks, column, tileSideLength * 5)
+    streetSprites:add(assets.ground.quads.plank_sidewalk, column, tileSideLength * 6)
+    streetSprites:add(assets.ground.quads.sidewalk, column, tileSideLength * 7)
+    streetSprites:add(assets.ground.quads.gutter, column, tileSideLength * 8)
+    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 9)
+    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 10)
+    streetSprites:add(assets.ground.quads.road_stripe,  column, tileSideLength * 11)
+    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 12)
+    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 13)
+    streetSprites:add(assets.ground.quads.gutter, column, tileSideLength * 14, math.pi, 1, 1, tileSideLength, tileSideLength)
+    streetSprites:add(assets.ground.quads.sidewalk, column, tileSideLength * 15, math.pi, 1, 1, tileSideLength, tileSideLength)
   end
 
-end
+  for i = 0, 9, 1 do
+    local y = 376 + (tileSideLength * i)
+    local xRight = lastRow - (5 + tileSideLength)
+    local xLeft = 5
+    obstaclesSprites:add(assets.obstacles.quads.barricade, xRight, y)
+    obstaclesSprites:add(assets.obstacles.quads.barricade, xLeft, y)
 
-local function intialize_world(entities, collision_world, screen)
+    collision_world:add( { name = string.format("%d barricade right", i) }, xRight, y, tileSideLength, tileSideLength)
+    collision_world:add( { name = string.format("%d barricade left", i) }, xLeft, y, tileSideLength, tileSideLength)
+  end
 
   collision_world:add( { name = "left bounding box" }, 5, 0, 1, screen.height)
-  collision_world:add( { name = "top bounding box" }, 5, screen.height * (2/5), screen.width * 10, 1)
-  collision_world:add( { name = "bottom bounding box" }, 5, screen.height * 0.9, screen.width * 10, 1)
+  collision_world:add( { name = "top bounding box" }, 5, screen.height * (2/5) - tileSideLength / 2, screen.width * 10, 1)
+  collision_world:add( { name = "bottom bounding box" }, 5, screen.height, screen.width * 10, 1)
   collision_world:add( { name = "right bounding box" }, screen.width * 10, 0, 1, screen.height)
-
-  --[[
-
-  for i = 0, 11, 1 do
-    table.insert(entities.road.barricades, Rectangle( 5, 372 + (64 * i), 64, 64 ))
-  end
-
-  for i = 0, 11, 1 do
-    table.insert(entities.road.barricades, Rectangle( screen.width * 10 - (5 + 64), 372 + (64 * i), 64, 64 ))
-  end
-
-  for i, rect in ipairs(entities.road.barricades) do
-    collision_world:add( { name = string.format("%d barricade", i) }, rect.x, rect.y, rect.width, rect.height)
-  end
-
-  --]]
 
 end
 
@@ -112,7 +111,8 @@ function Mainstate:enter()
   self.entities = {
     characters = {},
     enemies = {},
-    players = {}
+    players = {},
+    obstacles = {}
   }
   self.world = bump.newWorld()
   self.signal = Signal()
@@ -121,7 +121,7 @@ function Mainstate:enter()
 
   love.graphics.setFont(self.font)
 
-  setup_background(self.assets, self.streetSprites)
+  setup_background(self.assets, self.streetSprites, self.obstaclesSprites, SCREEN_VALUES, self.world)
 
   self.camera:zoom(2)
 
@@ -130,8 +130,6 @@ function Mainstate:enter()
 
   local e1 = newPunk(self, 700, SCREEN_VALUES.height * 0.7)
   local e2 = newPunk(self, 700, SCREEN_VALUES.height * 0.62)
-
-  intialize_world(self.entities, self.world, SCREEN_VALUES)
 
   table.insert(self.entities.players, p1)
   table.insert(self.entities.players, p2)
@@ -162,6 +160,7 @@ end
 function Mainstate:draw()
   self.camera:attach()
   love.graphics.draw(self.streetSprites)
+  love.graphics.draw(self.obstaclesSprites)
   for _, char in ipairs(self.entities.characters) do
     char:draw()
 

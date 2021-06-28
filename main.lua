@@ -51,7 +51,7 @@ GAMEOVER_COLORS =  {
 --]]
 
 GAMESTATES = {
-    main = Mainstate()
+    main = Mainstate
 }
 
 function love.load()
