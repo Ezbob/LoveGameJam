@@ -56,7 +56,7 @@ local function spairs(t, order)
   end
 end
 
-local function parser(filepath, outputHandler, labelSplitter)
+local function parse(filepath, outputHandler, labelSplitter)
   local json_data_ = loadJson(filepath)
   labelSplitter = labelSplitter or defaultLabelSplitter
 
@@ -98,7 +98,7 @@ end
 function AsepriteMetaParser.getGridsFromJSON(filepath, labelSplitter)
   local result = {}
 
-  parser(filepath, function (entityName, frameName, frameIndex, value)
+  parse(filepath, function (entityName, frameName, frameIndex, value)
 
     local column = (value["frame"]["x"] / value["sourceSize"]["w"]) + 1
     local row = (value["frame"]["y"] / value["sourceSize"]["h"]) + 1
@@ -119,7 +119,7 @@ end
 function AsepriteMetaParser.getQuadsFromJSON(filepath, labelSplitter)
   local result = {}
 
-  parser(filepath, function (entityName, frameName, frameIndex, value, key, imageSizes)
+  parse(filepath, function (entityName, frameName, frameIndex, value, key, imageSizes)
 
     local column = value["frame"]["x"]
     local row = value["frame"]["y"]
