@@ -13,6 +13,3 @@
 [submodule "modules/dkjson"]
 	path = modules/dkjson
 	url = https://github.com/LuaDist/dkjson.git
-[submodule ".\\modules\\sti"]
-	path = .\\modules\\sti
-	url = https://github.com/karai17/Simple-Tiled-Implementation.git
