@@ -29,7 +29,11 @@ end
 -- "frame" entries. This is needed to associate the frame data with the meta data.
 local function defaultLabelSplitter(label)
   local splitit = split(label, "-")
-  return splitit[2], splitit[3]
+  if #splitit >= 3 then
+    return splitit[2], splitit[3]
+  else
+    return splitit[1], splitit[2]
+  end
 end
 
 -- ordering pairs iterator
@@ -138,6 +142,22 @@ function AsepriteMetaParser.getQuadsFromJSON(filepath, labelSplitter)
       result[entityName] = love.graphics.newQuad(column, row, width, height, imageSizes.width, imageSizes.height)
     end
 
+  end, labelSplitter)
+
+  return result
+end
+
+function AsepriteMetaParser.getIndexedQuadsFromJSON(filepath, labelSplitter)
+  local result = {}
+
+  parse(filepath, function (entityName, frameName, frameIndex, value, key, imageSizes)
+
+    local column = value["frame"]["x"]
+    local row = value["frame"]["y"]
+    local width = value["frame"]["w"]
+    local height = value["frame"]["h"]
+
+    result[frameIndex + 1] = love.graphics.newQuad(column, row, width, height, imageSizes.width, imageSizes.height)
   end, labelSplitter)
 
   return result
