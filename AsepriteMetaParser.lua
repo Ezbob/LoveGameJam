@@ -4,7 +4,8 @@ local json = require "modules.dkjson.dkjson"
 local AsepriteMetaParser = {}
 
 local function loadJson(filename)
-  local file = io.open(filename, "r")
+  local file = love.filesystem.newFile(filename)
+  file:open('r')
   local str = "";
   for line in file:lines() do
     str = str .. line

@@ -8,7 +8,8 @@ local bit = require 'bit'
 local TiledLevel = Class {}
 
 local function loadJsonFile(filename)
-  local file = io.open(filename, "r")
+  local file = love.filesystem.newFile(filename)
+  file:open("r")
   local str = "";
   for line in file:lines() do
     str = str .. line
