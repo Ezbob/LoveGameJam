@@ -53,5 +53,5 @@ if __name__ == "__main__":
 			with f.open('rb') as fd:
 				shutil.copyfileobj(fd, fout)
 
-	if platform.system() == "Windows" and ".exe" not in DIST_FILE.name:
+	if platform.system() == "Windows" and DIST_FILE.suffix != ".exe":
 		DIST_FILE.rename(DIST_FILE.name + ".exe")
