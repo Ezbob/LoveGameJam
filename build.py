@@ -1,3 +1,6 @@
+"""
+Builds a .love file and a fused game executable from the specified sources.
+"""
 import pathlib
 import zipfile
 import shutil
@@ -46,7 +49,13 @@ if __name__ == "__main__":
 				if a.suffix == ".lua":
 					zfout.write(src)
 
-	lovepath = pathlib.Path(shutil.which('love.exe'))
+	# Taken from PATH
+	lovepath = shutil.which('love')
+
+	if lovepath is None:
+		raise ValueError("Could not infer love2d executable path")
+
+	lovepath = pathlib.Path(lovepath)
 
 	with DIST_FILE.open('wb') as fout:
 		for f in (lovepath, OUTPUT_FILE):
@@ -54,4 +63,4 @@ if __name__ == "__main__":
 				shutil.copyfileobj(fd, fout)
 
 	if platform.system() == "Windows" and DIST_FILE.suffix != ".exe":
-		DIST_FILE.rename(DIST_FILE.name + ".exe")
+		DIST_FILE.replace(DIST_FILE.name + ".exe")
