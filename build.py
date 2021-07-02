@@ -32,7 +32,7 @@ DIST_FILE = THIS_DIR / "game"
 if __name__ == "__main__":
 
 	parser = argparse.ArgumentParser(description="builds distribution")
-	parser.add_argument('-l', '--love2d', type=pathlib.Path, default=pathlib.Path(shutil.which('love')))
+	parser.add_argument('-l', '--love2d', type=pathlib.Path, default=pathlib.Path(shutil.which('love')), help="path to the love2d executable")
 	args = parser.parse_args()
 
 	with zipfile.ZipFile(OUTPUT_FILE.as_posix(), mode='w', compresslevel=9) as zfout:
