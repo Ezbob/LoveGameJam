@@ -132,27 +132,23 @@ function TiledLevel:populateLayers()
     local xscale, yscale = 1, 1
     local rotate = 0
 
-    if vflipped then
+    if vflipped and not dflipped then
       yscale = -1
       yoffset = self.tileHeight
     end
 
-    if hflipped then
+    if hflipped and not dflipped then
       xscale = -1
       xoffset = self.tileWidth
     end
 
     if dflipped and vflipped then
       rotate = (math.pi * 3 / 2)
-      yscale = 1
       xoffset = self.tileWidth
-      yoffset = 0
     end
 
     if dflipped and hflipped then
       rotate = (math.pi / 2)
-      xscale = 1
-      xoffset = 0
       yoffset = self.tileHeight
     end
 
