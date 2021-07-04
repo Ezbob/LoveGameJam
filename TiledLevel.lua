@@ -124,12 +124,13 @@ function TiledLevel:loadTilesFromAseprite(labelSplitter, prefix)
 end
 
 function TiledLevel:populateLayers()
-  parseTiledata(self.mapJSONData.layers, function (layerIndex, gid, x, y, hflipped, vflipped)
+  parseTiledata(self.mapJSONData.layers, function (layerIndex, gid, x, y, hflipped, vflipped, dflipped)
     local q = self.tileSets.quadIndex[gid]
     local batch = self.tileSets.spriteBatches[q.image]
 
     local xoffset, yoffset = 0, 0
     local xscale, yscale = 1, 1
+    local rotate = 0
 
     if vflipped then
       yscale = -1
@@ -141,7 +142,21 @@ function TiledLevel:populateLayers()
       xoffset = self.tileWidth
     end
 
-    batch:add(q.quad, self.tileWidth * (x - 1), self.tileHeight * (y - 1), 0, xscale, yscale, xoffset, yoffset)
+    if dflipped and vflipped then
+      rotate = (math.pi * 3 / 2)
+      yscale = 1
+      xoffset = self.tileWidth
+      yoffset = 0
+    end
+
+    if dflipped and hflipped then
+      rotate = (math.pi / 2)
+      xscale = 1
+      xoffset = 0
+      yoffset = self.tileHeight
+    end
+
+    batch:add(q.quad, self.tileWidth * (x - 1), self.tileHeight * (y - 1), rotate, xscale, yscale, xoffset, yoffset)
 
     self.sortedLayers[layerIndex] = batch
   end)
