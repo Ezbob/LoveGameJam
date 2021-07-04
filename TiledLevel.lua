@@ -128,15 +128,20 @@ function TiledLevel:populateLayers()
     local q = self.tileSets.quadIndex[gid]
     local batch = self.tileSets.spriteBatches[q.image]
 
-    if vflipped and not hflipped then
-      batch:add(q.quad, self.tileWidth * x, self.tileHeight * y, 0, 1, -1, 0, self.tileHeight)
-    elseif hflipped and not vflipped then
-      batch:add(q.quad, self.tileWidth * x, self.tileHeight * y, 0, -1, 1, self.tileWidth, 0)
-    elseif hflipped and vflipped then
-      batch:add(q.quad, self.tileWidth * x, self.tileHeight * y, 0, -1, -1, self.tileWidth, self.tileHeight)
-    else
-      batch:add(q.quad, self.tileWidth * x, self.tileHeight * y)
+    local xoffset, yoffset = 0, 0
+    local xscale, yscale = 1, 1
+
+    if vflipped then
+      yscale = -1
+      yoffset = self.tileHeight
     end
+
+    if hflipped then
+      xscale = -1
+      xoffset = self.tileWidth
+    end
+
+    batch:add(q.quad, self.tileWidth * (x - 1), self.tileHeight * (y - 1), 0, xscale, yscale, xoffset, yoffset)
 
     self.sortedLayers[layerIndex] = batch
   end)
