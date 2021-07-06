@@ -4,6 +4,7 @@ local json = require 'modules.dkjson.dkjson'
 local StringUtils = require 'StringUtils'
 local AsepriteMetaParser = require 'AsepriteMetaParser'
 local bit = require 'bit'
+local rectangle = require "rectangle"
 
 local TiledLevel = Class {}
 
@@ -124,6 +125,9 @@ function TiledLevel:loadTilesFromAseprite(labelSplitter, prefix)
 end
 
 function TiledLevel:populateLayers()
+  if DEBUG then
+    self.debugRects = {}
+  end
   parseTiledata(self.mapJSONData.layers, function (layerIndex, gid, x, y, hflipped, vflipped, dflipped)
     local q = self.tileSets.quadIndex[gid]
     local batch = self.tileSets.spriteBatches[q.image]
@@ -152,15 +156,70 @@ function TiledLevel:populateLayers()
       yoffset = self.tileHeight
     end
 
-    batch:add(q.quad, self.tileWidth * (x - 1), self.tileHeight * (y - 1), rotate, xscale, yscale, xoffset, yoffset)
+    local xPixel = self.tileWidth * (x - 1)
+    local yPixel = self.tileHeight * (y - 1)
+
+    batch:add(q.quad, xPixel, yPixel, rotate, xscale, yscale, xoffset, yoffset)
 
     self.sortedLayers[layerIndex] = batch
+
+    if self.collisionLookup and self.worldCollision then
+      local layer = self.collisionLookup[layerIndex]
+      if layer ~= nil then
+        local tile = layer[gid]
+        if tile then
+          for i, collisionObject in ipairs(tile.objectgroup.objects) do
+            self.worldCollision:add({ name = collisionObject.name },
+              xPixel + collisionObject.x,
+              yPixel + collisionObject.y,
+              collisionObject.width,
+              collisionObject.height
+            )
+            if DEBUG then
+              table.insert(self.debugRects,
+                rectangle(
+                  xPixel + collisionObject.x,
+                  yPixel + collisionObject.y,
+                  collisionObject.width,
+                  collisionObject.height
+                )
+              )
+            end
+          end
+        end
+      end
+    end
   end)
+end
+
+function TiledLevel:addExtractCollisions(collision)
+  self.collisionLookup = {}
+  self.worldCollision = collision
+  for tileIndex, tileset in ipairs(self.mapJSONData.tileSets) do
+    if tileset.tiles then
+      local firstgid = tileset.firstgid
+      if not self.collisionLookup[tileIndex] then
+        self.collisionLookup[tileIndex] = {}
+      end
+      for i, tile in ipairs(tileset.tiles) do
+        local gid = firstgid + tile.id
+        self.collisionLookup[tileIndex][gid] = tile
+      end
+    end
+  end
 end
 
 function TiledLevel:draw()
   for i, value in ipairs(self.sortedLayers) do
     love.graphics.draw(value)
+  end
+  if DEBUG then
+    for i, r in ipairs(self.debugRects) do
+      --love.graphics.draw("line", r.x, r.y, r.w, r.h)
+      --print(inspect(r))
+      --print(r.x, r.y, r.width, r.height)
+      r:draw()
+    end
   end
 end
 

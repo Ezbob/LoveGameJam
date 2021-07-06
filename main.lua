@@ -55,18 +55,9 @@ GAMESTATES = {
     main = Mainstate
 }
 
-D = nil
-
 function love.load()
-
-
-    D = TiledLevel('Assets/level1.json')
-    D:loadTilesFromAseprite()
-    D:populateLayers()
-
-
-    --Gamestate.registerEvents()
-    --Gamestate.switch(GAMESTATES.main)
+    Gamestate.registerEvents()
+    Gamestate.switch(GAMESTATES.main)
 end
 
 
@@ -79,7 +70,7 @@ function love.update(dt)
 end
 
 function love.draw()
-    D:draw()
+    --D:draw()
 end
 
 --[[

@@ -3,10 +3,12 @@ local Class = require "modules.hump.class"
 
 local Hitbox = Class {__includes = Rectangle}
 
-function Hitbox:init(tag, offset_x, offset_y, w, h)
+function Hitbox:init(tag, x, y, offset_x, offset_y, w, h)
   Rectangle.init(self, 0, 0, w, h)
   self.name = tag
   self.active = false
+  self.x = x
+  self.y = y
   self.offset_x = offset_x or 0
   self.offset_y = offset_y or 0
 end

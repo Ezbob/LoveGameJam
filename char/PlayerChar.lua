@@ -60,7 +60,12 @@ local function playerCollisionFilter(me, other)
 end
 
 function PlayerChar:move(relative_x, relative_y)
-  local actualX, actualY, col, len = self.collision:move(self, self.x + relative_x, self.y + relative_y, playerCollisionFilter)
+  local actualX, actualY, col, len = self.collision:move(self,
+      self.x + relative_x, self.y + relative_y,
+      playerCollisionFilter)
+
+  --print(self.x, self.y, relative_x, relative_y, actualX, actualY)
+
   self.x = actualX
   self.y = actualY
 end

@@ -1,12 +1,12 @@
 local Class = require "modules.hump.class"
 local bump = require "modules.bump.bump"
 local Signal = require "modules.hump.signal"
-local Rectangle = require "rectangle"
 local inspect = require "modules.inspect.inspect"
 local AsepriteMetaParser = require "AsepriteMetaParser"
 local Camera = require "modules.hump.camera"
 local PlayerChar = require "char.PlayerChar"
 local PunkChar = require "char.PunkChar"
+local TiledLevel = require "TiledLevel"
 
 local Mainstate = Class {}
 
@@ -33,6 +33,7 @@ function Mainstate:init()
   }
   self.streetSprites = love.graphics.newSpriteBatch(self.assets.ground.sheet)
   self.obstaclesSprites = love.graphics.newSpriteBatch(self.assets.obstacles.sheet)
+
 end
 
 local function setup_background(assets, streetSprites, obstaclesSprites, screen, collision_world)
@@ -119,9 +120,14 @@ function Mainstate:enter()
   self.streetSprites:clear()
   self.camera = Camera(0, 0)
 
+  self.tileMap = TiledLevel('Assets/level1.json')
+  self.tileMap:loadTilesFromAseprite()
+  self.tileMap:addExtractCollisions(self.world)
+  self.tileMap:populateLayers()
+
   love.graphics.setFont(self.font)
 
-  setup_background(self.assets, self.streetSprites, self.obstaclesSprites, SCREEN_VALUES, self.world)
+  --setup_background(self.assets, self.streetSprites, self.obstaclesSprites, SCREEN_VALUES, self.world)
 
   self.camera:zoom(2)
 
@@ -159,6 +165,7 @@ end
 
 function Mainstate:draw()
   self.camera:attach()
+  self.tileMap:draw()
   love.graphics.draw(self.streetSprites)
   love.graphics.draw(self.obstaclesSprites)
   for _, char in ipairs(self.entities.characters) do
