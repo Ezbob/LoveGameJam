@@ -4,7 +4,6 @@ local inspect = require "modules.inspect.inspect"
 
 local PlayerChar = Class {
   __includes = Char,
-  type = "player",
   name = "player" -- collision id
 }
 
@@ -52,7 +51,7 @@ function PlayerChar:die()
 end
 
 local function playerCollisionFilter(me, other)
-  if other.type == "punk" or other.type == "heavy" or other.type == "player" then
+  if other.name == "punk" or other.name == "heavy" or other.name == "player" then
       return "cross"
   end
 

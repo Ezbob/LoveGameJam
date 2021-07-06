@@ -4,7 +4,6 @@ local inspect = require "modules.inspect.inspect"
 
 local PunkChar = Class {
   __includes = Char,
-  type = "punk",
   name = "punk" -- collision id
 }
 

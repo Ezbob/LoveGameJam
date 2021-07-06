@@ -6,7 +6,6 @@ local AnimationSet = require "char.AnimationSet"
 
 local Char = Class {
   __includes = Rectangle,
-  type = "char",
   name = "char" -- collision id
 }
 
