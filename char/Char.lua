@@ -12,7 +12,7 @@ local Char = Class {
 function Char:init(x, y, w, h, animationSet, currentAnimation, spriteOffsets)
   Rectangle.init(self, x, y, w, h)
   self.animations = animationSet
-  self.spriteOffsets = spriteOffsets or Rectangle(-w, -h, w, h)
+  self.spriteOffsets = spriteOffsets or {x = -w, y = -h }
   self.alive = true
   self.facingRight = true
   self.currentAnimation = currentAnimation or 'idle'

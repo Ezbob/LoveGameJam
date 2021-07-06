@@ -21,7 +21,7 @@ function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid,
   Char.init(self, x, y, width, height,
     AnimationSet(sheet, {width = 76, height = 104}),
     'idle',
-    Rectangle(-width, -(height - 15), 0, 0)
+    {x = -width, y =  -(height - 15)}
   )
 
   self.playerId = id
