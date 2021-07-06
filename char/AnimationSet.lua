@@ -20,6 +20,7 @@ local AnimationSet = Class {}
 
 function AnimationSet:init(image, box)
   self.sheet = newSheet(image, box)
+  self.box = box
   self.set = {}
 end
 

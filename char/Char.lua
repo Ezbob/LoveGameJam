@@ -2,16 +2,17 @@ local Rectangle = require "rectangle"
 local Hitbox = require "char.Hitbox"
 local inspect = require "modules.inspect.inspect"
 local Class = require "modules.hump.class"
-local AnimationSet = require "char.AnimationSet"
 
 local Char = Class {
   __includes = Rectangle,
-  name = "char" -- collision id
+  name = "char", -- collision id
+  spriteOffsets = nil
 }
 
-function Char:init(x, y, w, h, currentAnimation, image)
+function Char:init(x, y, w, h, animationSet, currentAnimation, spriteOffsets)
   Rectangle.init(self, x, y, w, h)
-  self.animations = AnimationSet(image, {width = self.width, height = self.height})
+  self.animations = animationSet
+  self.spriteOffsets = spriteOffsets or Rectangle(-w, -h, w, h)
   self.alive = true
   self.facingRight = true
   self.currentAnimation = currentAnimation or 'idle'
@@ -55,7 +56,10 @@ function Char:faceLeft()
 end
 
 function Char:draw()
-  self.animations:drawState(self.currentAnimation, self.x, self.y)
+  self.animations:drawState(self.currentAnimation,
+    self.x + self.spriteOffsets.x,
+    self.y + self.spriteOffsets.y
+  )
 end
 
 function Char:setCurrentAnimation(name)
