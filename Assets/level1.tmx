@@ -10,22 +10,22 @@
   <image source="obstacles_small.png" width="256" height="64"/>
   <tile id="0" type="obstacle">
    <objectgroup draworder="index" id="2">
-    <object id="2" name="obstacle" x="8" y="0" width="48" height="64"/>
+    <object id="2" name="obstacle" x="8" y="29.4312" width="48" height="34.5688"/>
    </objectgroup>
   </tile>
   <tile id="1" type="obstacle">
    <objectgroup draworder="index" id="2">
-    <object id="5" name="obstacle" x="0" y="16" width="64" height="48"/>
+    <object id="5" name="obstacle" x="0" y="35.7342" width="64" height="28.2658"/>
    </objectgroup>
   </tile>
   <tile id="2" type="obstacle">
    <objectgroup draworder="index" id="2">
-    <object id="1" name="obstacle" x="0.340245" y="-0.170122" width="60" height="64"/>
+    <object id="1" name="obstacle" x="0.340245" y="21.7757" width="60" height="42.0542"/>
    </objectgroup>
   </tile>
   <tile id="3" type="obstacle">
    <objectgroup draworder="index" id="5">
-    <object id="9" name="obstacle" x="0" y="0" width="64" height="64"/>
+    <object id="9" name="obstacle" x="4.25306" y="0" width="54.6433" height="64"/>
    </objectgroup>
   </tile>
  </tileset>

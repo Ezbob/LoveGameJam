@@ -75,7 +75,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "height":64,
+                             "height":34.56884635832,
                              "id":2,
                              "name":"obstacle",
                              "rotation":0,
@@ -83,7 +83,7 @@
                              "visible":true,
                              "width":48,
                              "x":8,
-                             "y":0
+                             "y":29.43115364168
                             }],
                      "opacity":1,
                      "type":"objectgroup",
@@ -102,7 +102,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "height":48,
+                             "height":28.2658160552897,
                              "id":5,
                              "name":"obstacle",
                              "rotation":0,
@@ -110,7 +110,7 @@
                              "visible":true,
                              "width":64,
                              "x":0,
-                             "y":16
+                             "y":35.7341839447103
                             }],
                      "opacity":1,
                      "type":"objectgroup",
@@ -129,15 +129,15 @@
                      "name":"",
                      "objects":[
                             {
-                             "height":64,
+                             "height":42.0542264752791,
                              "id":1,
                              "name":"obstacle",
                              "rotation":0,
                              "type":"",
                              "visible":true,
                              "width":60,
-                             "x":0.340244550770866,
-                             "y":-0.170122275385431
+                             "x":0.340245,
+                             "y":21.7756515247209
                             }],
                      "opacity":1,
                      "type":"objectgroup",
@@ -162,8 +162,8 @@
                              "rotation":0,
                              "type":"",
                              "visible":true,
-                             "width":64,
-                             "x":0,
+                             "width":54.6432748538012,
+                             "x":4.25305688463583,
                              "y":0
                             }],
                      "opacity":1,

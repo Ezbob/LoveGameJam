@@ -6,6 +6,19 @@ local AsepriteMetaParser = require 'AsepriteMetaParser'
 local bit = require 'bit'
 local rectangle = require "rectangle"
 
+local TiledLevelLayer = Class {}
+
+function TiledLevelLayer:init(batch, index)
+  self.spriteBatch = batch
+  self.index = index or -1
+end
+
+function TiledLevelLayer:draw()
+  if self.spriteBatch then
+    love.graphics.draw(self.spriteBatch)
+  end
+end
+
 local TiledLevel = Class {}
 
 local function loadJsonFile(filename)
@@ -161,7 +174,7 @@ function TiledLevel:populateLayers()
 
     batch:add(q.quad, xPixel, yPixel, rotate, xscale, yscale, xoffset, yoffset)
 
-    self.sortedLayers[layerIndex] = batch
+    self.sortedLayers[layerIndex] = TiledLevelLayer(batch, layerIndex)
 
     if self.collisionLookup and self.worldCollision then
       local layer = self.collisionLookup[layerIndex]
@@ -192,7 +205,7 @@ function TiledLevel:populateLayers()
   end)
 end
 
-function TiledLevel:addExtractCollisions(collision)
+function TiledLevel:extractCollisions(collision)
   self.collisionLookup = {}
   self.worldCollision = collision
   for tileIndex, tileset in ipairs(self.mapJSONData.tileSets) do
@@ -210,17 +223,22 @@ function TiledLevel:addExtractCollisions(collision)
 end
 
 function TiledLevel:draw()
-  for i, value in ipairs(self.sortedLayers) do
-    love.graphics.draw(value)
+  for i, layer in ipairs(self.sortedLayers) do
+    layer:draw()
   end
-  if DEBUG then
+  if DEBUG and self.debugRects then
     for i, r in ipairs(self.debugRects) do
-      --love.graphics.draw("line", r.x, r.y, r.w, r.h)
-      --print(inspect(r))
-      --print(r.x, r.y, r.width, r.height)
       r:draw()
     end
   end
+end
+
+function TiledLevel:addLayer(layer, layerIndex)
+  table.insert(self.sortedLayers, layerIndex, layer)
+end
+
+function TiledLevel:getLayers()
+  return self.sortedLayers
 end
 
 return TiledLevel

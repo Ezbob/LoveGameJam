@@ -36,46 +36,6 @@ function Mainstate:init()
 
 end
 
-local function setup_background(assets, streetSprites, obstaclesSprites, screen, collision_world)
-
-  local tileSideLength = 64
-  local lastRow = screen.width * 2
-  local spriteCount = (lastRow / tileSideLength) - 1
-  for i = 0, spriteCount, 1 do
-    local column = i * tileSideLength
-    streetSprites:add(assets.ground.quads.plank_top, column, tileSideLength * 3)
-    streetSprites:add(assets.ground.quads.planks, column, tileSideLength * 4)
-    streetSprites:add(assets.ground.quads.planks, column, tileSideLength * 5)
-    streetSprites:add(assets.ground.quads.plank_sidewalk, column, tileSideLength * 6)
-    streetSprites:add(assets.ground.quads.sidewalk, column, tileSideLength * 7)
-    streetSprites:add(assets.ground.quads.gutter, column, tileSideLength * 8)
-    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 9)
-    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 10)
-    streetSprites:add(assets.ground.quads.road_stripe,  column, tileSideLength * 11)
-    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 12)
-    streetSprites:add(assets.ground.quads.asphalt, column, tileSideLength * 13)
-    streetSprites:add(assets.ground.quads.gutter, column, tileSideLength * 14, math.pi, 1, 1, tileSideLength, tileSideLength)
-    streetSprites:add(assets.ground.quads.sidewalk, column, tileSideLength * 15, math.pi, 1, 1, tileSideLength, tileSideLength)
-  end
-
-  for i = 0, 9, 1 do
-    local y = 376 + (tileSideLength * i)
-    local xRight = lastRow - (5 + tileSideLength)
-    local xLeft = 5
-    obstaclesSprites:add(assets.obstacles.quads.barricade, xRight, y)
-    obstaclesSprites:add(assets.obstacles.quads.barricade, xLeft, y)
-
-    collision_world:add( { name = string.format("%d barricade right", i) }, xRight, y, tileSideLength, tileSideLength)
-    collision_world:add( { name = string.format("%d barricade left", i) }, xLeft, y, tileSideLength, tileSideLength)
-  end
-
-  collision_world:add( { name = "left bounding box" }, 5, 0, 1, screen.height)
-  collision_world:add( { name = "top bounding box" }, 5, screen.height * (2/5) - tileSideLength / 2, screen.width * 10, 1)
-  collision_world:add( { name = "bottom bounding box" }, 5, screen.height, screen.width * 10, 1)
-  collision_world:add( { name = "right bounding box" }, screen.width * 10, 0, 1, screen.height)
-
-end
-
 local function newPlayer(self, id, x, y)
   local aniTag = "player1"
   if id > 1 then
@@ -122,7 +82,7 @@ function Mainstate:enter()
 
   self.tileMap = TiledLevel('Assets/level1.json')
   self.tileMap:loadTilesFromAseprite()
-  self.tileMap:addExtractCollisions(self.world)
+  self.tileMap:extractCollisions(self.world)
   self.tileMap:populateLayers()
 
   love.graphics.setFont(self.font)
@@ -150,6 +110,22 @@ function Mainstate:enter()
     table.insert(self.entities.characters, p)
   end
 
+  local CharacterLayer = {
+    sprites = self.entities.characters
+  }
+
+  function CharacterLayer:draw()
+    for _, char in ipairs(self.sprites) do
+      char:draw()
+
+      if DEBUG then
+        char:drawDebug()
+      end
+    end
+  end
+
+  -- this adds the characters infront of the background tiles but behind the obstacles
+  self.tileMap:addLayer(CharacterLayer, 2)
 end
 
 
@@ -165,16 +141,8 @@ end
 
 function Mainstate:draw()
   self.camera:attach()
-  self.tileMap:draw()
-  love.graphics.draw(self.streetSprites)
-  love.graphics.draw(self.obstaclesSprites)
-  for _, char in ipairs(self.entities.characters) do
-    char:draw()
 
-    if DEBUG then
-      char:drawDebug()
-    end
-  end
+  self.tileMap:draw()
 
   self.camera:detach()
 end

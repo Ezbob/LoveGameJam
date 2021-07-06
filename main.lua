@@ -1,6 +1,5 @@
 love.filesystem.setRequirePath('?.lua;?/init.lua;?/main.lua;modules/?/?.lua;modules/?.lua')
 
-local camera = require "camera"
 if DEBUG then
     io.stdout:setvbuf('no')
 end
