@@ -87,15 +87,13 @@ function Mainstate:enter()
 
   love.graphics.setFont(self.font)
 
-  --setup_background(self.assets, self.streetSprites, self.obstaclesSprites, SCREEN_VALUES, self.world)
-
   self.camera:zoom(2)
 
-  local p1 = newPlayer(self, 1, 100, SCREEN_VALUES.height * 0.65)
-  local p2 = newPlayer(self, 2, 100, SCREEN_VALUES.height * 0.55)
+  local p1 = newPlayer(self, 1, 100, SCREEN_VALUES.height * 0.45)
+  local p2 = newPlayer(self, 2, 100, SCREEN_VALUES.height * 0.35)
 
-  local e1 = newPunk(self, 700, SCREEN_VALUES.height * 0.7)
-  local e2 = newPunk(self, 700, SCREEN_VALUES.height * 0.62)
+  local e1 = newPunk(self, 705, SCREEN_VALUES.height * 0.5)
+  local e2 = newPunk(self, 705, SCREEN_VALUES.height * 0.42)
 
   table.insert(self.entities.players, p1)
   table.insert(self.entities.players, p2)
@@ -124,6 +122,14 @@ function Mainstate:enter()
     end
   end
 
+  local w, h = self.tileMap:levelPixelDimensions()
+  self.upperBoundary = { x = 0, y = self.tileMap.tileWidth * 2, name = "upperBoundary", width = w, height = 2 }
+  self.lowerBoundary = { x = 0, y = h - (self.tileMap.tileWidth * 2), name = "lowerBoundary", width = w, height = 2}
+
+  self.world:add(self.upperBoundary, self.upperBoundary.x, self.upperBoundary.y, self.upperBoundary.width, self.upperBoundary.height)
+  self.world:add(self.lowerBoundary, self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.width, self.lowerBoundary.height)
+
+
   -- this adds the characters infront of the background tiles but behind the obstacles
   self.tileMap:addLayer(CharacterLayer, 2)
 end
@@ -143,8 +149,13 @@ function Mainstate:draw()
   self.camera:attach()
 
   self.tileMap:draw()
-
+  if DEBUG then
+    love.graphics.line(self.upperBoundary.x, self.upperBoundary.y, self.upperBoundary.x + self.upperBoundary.width, self.upperBoundary.y + self.upperBoundary.height)
+    love.graphics.line(self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.x + self.lowerBoundary.width, self.lowerBoundary.y + self.lowerBoundary.height)
+  end
   self.camera:detach()
+
+
 end
 
 return Mainstate

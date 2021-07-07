@@ -241,4 +241,11 @@ function TiledLevel:getLayers()
   return self.sortedLayers
 end
 
+-- get the pixel width and height
+function TiledLevel:levelPixelDimensions()
+  local pixelWidth = self.tileWidth * self.mapWidth
+  local pixelHeight = self.tileHeight * self.mapHeight
+  return pixelWidth, pixelHeight
+end
+
 return TiledLevel
