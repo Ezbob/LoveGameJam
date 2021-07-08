@@ -6,7 +6,7 @@ local AsepriteMetaParser = require "AsepriteMetaParser"
 local Camera = require "modules.hump.camera"
 local PlayerChar = require "char.PlayerChar"
 local PunkChar = require "char.PunkChar"
-local TiledLevel = require "TiledLevel"
+local TiledLevel = require "tilemap.TiledLevel"
 
 local Mainstate = Class {}
 
@@ -31,9 +31,6 @@ function Mainstate:init()
       quads = AsepriteMetaParser.getQuadsFromJSON("Assets/obstacles_small.json")
     }
   }
-  self.streetSprites = love.graphics.newSpriteBatch(self.assets.ground.sheet)
-  self.obstaclesSprites = love.graphics.newSpriteBatch(self.assets.obstacles.sheet)
-
 end
 
 local function newPlayer(self, id, x, y)
@@ -77,7 +74,6 @@ function Mainstate:enter()
   }
   self.world = bump.newWorld()
   self.signal = Signal()
-  self.streetSprites:clear()
   self.camera = Camera(0, 0)
 
   self.tileMap = TiledLevel('Assets/level1.json')
