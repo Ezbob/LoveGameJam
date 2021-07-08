@@ -1,33 +1,39 @@
 """
 Builds a .love file and a fused game executable from the specified sources.
 """
+import os
 import pathlib
 import zipfile
 import shutil
 import platform
 import argparse
+import tempfile
+import typing
 
 
 THIS_DIR = pathlib.Path(".")
+ABSOLUTE_DIR = THIS_DIR.resolve()
 
-ASSETS_FILES = THIS_DIR / "Assets"
+ASSETS_PREFIX = THIS_DIR / "Assets"
+SOURCE_PREFIX = THIS_DIR / "src"
+MODULES_PREFIX = THIS_DIR / "modules"
 
-SOURCE_DIRS = (
-	THIS_DIR / "char",
-	THIS_DIR / "gamestates"
-)
+OUTPUT_FILE = THIS_DIR / "dist" / "game.love"
+DIST_FILE = THIS_DIR / "dist" / "game"
 
-MODULES = (
-	THIS_DIR / "modules" / "hump",
-	THIS_DIR / "modules" / "anim8",
-	THIS_DIR / "modules" / "bump",
-	THIS_DIR / "modules" / "dkjson",
-	THIS_DIR / "modules" / "inspect",
-)
 
-OUTPUT_FILE = THIS_DIR / "game.love"
+def iterative_filewrite(prefix: pathlib.Path, out: zipfile.ZipFile, file_filter: typing.Callable):
+	stack = [p for p in prefix.iterdir()]
+	while len(stack) > 0:
+		path = stack.pop()
 
-DIST_FILE = THIS_DIR / "game"
+		if path.is_file() and file_filter(path):
+			out.write(path)
+
+		if path.is_dir():
+			for path2 in path.iterdir():
+				stack.append(path2)
+
 
 if __name__ == "__main__":
 
@@ -35,24 +41,18 @@ if __name__ == "__main__":
 	parser.add_argument('-l', '--love2d', type=pathlib.Path, default=pathlib.Path(shutil.which('love')), help="path to the love2d executable")
 	args = parser.parse_args()
 
-	with zipfile.ZipFile(OUTPUT_FILE.as_posix(), mode='w', compresslevel=9) as zfout:
-		for p in ASSETS_FILES.iterdir():
-			if p.suffix != ".aseprite" and p.suffix != ".tmx":
-				zfout.write(p)
+	with zipfile.ZipFile(OUTPUT_FILE, mode='w', compresslevel=9) as zfout:
+		lua_filter = lambda p: (p.suffix == ".lua" or "LICENSE" in p.name)
+		asset_filter = lambda p: (p.suffix != ".aseprite" and p.suffix != ".tmx")
 
-		for module in MODULES:
-			for d in module.iterdir():
-				if d.suffix == ".lua" or "LICENSE" in d.name:
-					zfout.write(d)
+		iterative_filewrite(MODULES_PREFIX, zfout, lua_filter)
+		iterative_filewrite(ASSETS_PREFIX, zfout, asset_filter)
 
-		for a in THIS_DIR.iterdir():
-			if a.suffix == ".lua" or "LICENSE" in d.name:
-				zfout.write(a)
+		os.chdir(SOURCE_PREFIX)
+		iterative_filewrite(pathlib.Path("."), zfout, lua_filter)
+		os.chdir(ABSOLUTE_DIR)
 
-		for sd in SOURCE_DIRS:
-			for src in sd.iterdir():
-				if a.suffix == ".lua":
-					zfout.write(src)
+		zfout.write("main.lua")
 
 	# Taken from PATH
 	lovepath = args.love2d
@@ -62,10 +62,13 @@ if __name__ == "__main__":
 
 	lovepath = pathlib.Path(lovepath)
 
+	if platform.system() == "Windows" and DIST_FILE.suffix != ".exe":
+		DIST_FILE = DIST_FILE.with_suffix(".exe")
+
+	DIST_FILE.parent.mkdir(parents=True, exist_ok=True)
 	with DIST_FILE.open('wb') as fout:
 		for f in (lovepath, OUTPUT_FILE):
 			with f.open('rb') as fd:
 				shutil.copyfileobj(fd, fout)
 
-	if platform.system() == "Windows" and DIST_FILE.suffix != ".exe":
-		DIST_FILE.replace(DIST_FILE.name + ".exe")
+

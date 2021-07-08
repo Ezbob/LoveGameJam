@@ -17,6 +17,12 @@
             "label": "test it",
             "type": "shell",
             "command": "lua53 ${workspaceFolder}/test.lua"
+        },
+        {
+            "label": "build it",
+            "type": "shell",
+            "command": "./build.py",
+            "group": "build"
         }
     ]
 }

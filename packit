@@ -1,5 +1,0 @@
-#!/bin/sh
-
-zip -r game.love --exclude=*.git* --exclude=packit --exclude=init --exclude=game.love * 
-
-

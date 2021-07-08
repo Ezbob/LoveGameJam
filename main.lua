@@ -1,4 +1,4 @@
-love.filesystem.setRequirePath('?.lua;?/init.lua;?/main.lua;modules/?/?.lua;modules/?.lua')
+love.filesystem.setRequirePath('?.lua;?/init.lua;src/?.lua;?/main.lua;modules/?/?.lua;modules/?.lua')
 
 if DEBUG then
     io.stdout:setvbuf('no')
