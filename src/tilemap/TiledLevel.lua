@@ -174,7 +174,9 @@ function TiledLevel:populateLayers()
 
     batch:add(q.quad, xPixel, yPixel, rotate, xscale, yscale, xoffset, yoffset)
 
-    self.sortedLayers[layerIndex] = TiledLevelLayer(batch, layerIndex)
+    if self.sortedLayers[layerIndex] == nil then
+      self.sortedLayers[layerIndex] = TiledLevelLayer(batch, layerIndex)
+    end
 
     if self.collisionLookup and self.worldCollision then
       local layer = self.collisionLookup[layerIndex]
