@@ -22,17 +22,46 @@ OUTPUT_FILE = THIS_DIR / "dist" / "game.love"
 DIST_FILE = THIS_DIR / "dist" / "game"
 
 
-def iterative_filewrite(prefix: pathlib.Path, out: zipfile.ZipFile, file_filter: typing.Callable):
+def iterative_filewrite(prefix: pathlib.Path, out: zipfile.ZipFile, file_filter: typing.Callable = None):
 	stack = [p for p in prefix.iterdir()]
 	while len(stack) > 0:
 		path = stack.pop()
 
-		if path.is_file() and file_filter(path):
+		if path.is_file() and (file_filter is None or file_filter(path)):
 			out.write(path)
 
 		if path.is_dir():
 			for path2 in path.iterdir():
 				stack.append(path2)
+
+
+def make_zipfile(love_file: pathlib.Path):
+	love_file.parent.mkdir(parents=True, exist_ok=True)
+	with zipfile.ZipFile(love_file, mode='w', compresslevel=9) as zip_file:
+		lua_filter = lambda p: (p.suffix == ".lua" or "LICENSE" in p.name)
+		asset_filter = lambda p: (p.suffix != ".aseprite" and p.suffix != ".tmx")
+
+		iterative_filewrite(ASSETS_PREFIX, zip_file, asset_filter)
+		iterative_filewrite(MODULES_PREFIX, zip_file, lua_filter)
+		iterative_filewrite(SOURCE_PREFIX, zip_file, lua_filter)
+
+		zip_file.write("main.lua")
+
+
+def make_fused_game(love_exec_path: pathlib.Path, fused_executable_path: pathlib.Path, love_file: pathlib.Path):
+	fused_executable_path.parent.mkdir(parents=True, exist_ok=True)
+	
+	if love_exec_path is None:
+		raise ValueError("Could not infer love2d executable path")
+
+	if platform.system() == "Windows" and fused_executable_path.suffix != ".exe":
+		fused_executable_path = fused_executable_path.with_suffix(".exe")
+
+	fused_executable_path.parent.mkdir(parents=True, exist_ok=True)
+	with fused_executable_path.open('wb') as fout:
+		for f in (love_exec_path, love_file):
+			with f.open('rb') as fd:
+				shutil.copyfileobj(fd, fout)
 
 
 if __name__ == "__main__":
@@ -41,34 +70,5 @@ if __name__ == "__main__":
 	parser.add_argument('-l', '--love2d', type=pathlib.Path, default=pathlib.Path(shutil.which('love')), help="path to the love2d executable")
 	args = parser.parse_args()
 
-	with zipfile.ZipFile(OUTPUT_FILE, mode='w', compresslevel=9) as zfout:
-		lua_filter = lambda p: (p.suffix == ".lua" or "LICENSE" in p.name)
-		asset_filter = lambda p: (p.suffix != ".aseprite" and p.suffix != ".tmx")
-
-		iterative_filewrite(MODULES_PREFIX, zfout, lua_filter)
-		iterative_filewrite(ASSETS_PREFIX, zfout, asset_filter)
-
-		os.chdir(SOURCE_PREFIX)
-		iterative_filewrite(pathlib.Path("."), zfout, lua_filter)
-		os.chdir(ABSOLUTE_DIR)
-
-		zfout.write("main.lua")
-
-	# Taken from PATH
-	lovepath = args.love2d
-
-	if lovepath is None:
-		raise ValueError("Could not infer love2d executable path")
-
-	lovepath = pathlib.Path(lovepath)
-
-	if platform.system() == "Windows" and DIST_FILE.suffix != ".exe":
-		DIST_FILE = DIST_FILE.with_suffix(".exe")
-
-	DIST_FILE.parent.mkdir(parents=True, exist_ok=True)
-	with DIST_FILE.open('wb') as fout:
-		for f in (lovepath, OUTPUT_FILE):
-			with f.open('rb') as fd:
-				shutil.copyfileobj(fd, fout)
-
-
+	make_zipfile(love_file=OUTPUT_FILE)
+	make_fused_game(love_exec_path=args.love2d, fused_executable_path=DIST_FILE, love_file=OUTPUT_FILE)
