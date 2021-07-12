@@ -7,6 +7,8 @@ local Camera = require "modules.hump.camera"
 local PlayerChar = require "char.PlayerChar"
 local PunkChar = require "char.PunkChar"
 local TiledLevel = require "tilemap.TiledLevel"
+local rectangle        = require "rectangle"
+
 
 local Mainstate = Class {}
 
@@ -64,22 +66,58 @@ local function newPunk(self, x, y)
   return res
 end
 
-
 function Mainstate:enter()
   self.entities = {
     characters = {},
     enemies = {},
     players = {},
-    obstacles = {}
+    obstacles = {},
   }
+  self.drawings = {}
+
+  local function insertDrawableEntity(key, entry)
+    table.insert(self.entities[key], entry)
+    table.insert(self.drawings, entry)
+  end
+
+  local Obstacles = Class{__includes=rectangle}
+
+  function Obstacles:init(tileInfo, transform)
+    self.image = tileInfo.image
+    self.quad = tileInfo.quad
+    self.transform = transform
+
+    local _, _, w, h = self.quad:getViewport()
+    rectangle.init(self, self.transform.x, self.transform.y, w, h)
+  end
+
+  function Obstacles:draw()
+    love.graphics.draw(self.image, self.quad, self.transform.x, self.transform.y, self.transform.r, self.transform.sx, self.transform.sy, self.transform.ox, self.transform.oy)
+    if DEBUG then
+      rectangle.draw(self)
+    end
+  end
+
   self.world = bump.newWorld()
   self.signal = Signal()
   self.camera = Camera(0, 0)
 
   self.tileMap = TiledLevel('Assets/level1.json')
-  self.tileMap:loadTilesFromAseprite()
+  self.tileMap:loadTileSets('aseprite')
   self.tileMap:extractCollisions(self.world)
-  self.tileMap:populateLayers()
+  self.tileMap:populateLayers(function (layerIndex, layerName, transform, tileSetInfo)
+
+    if layerName == "background" then
+      if not self.background then
+        self.background = love.graphics.newSpriteBatch(tileSetInfo.image)
+      end
+      self.background:add(tileSetInfo.quad, transform.x, transform.y, transform.r, transform.sx, transform.sy, transform.ox, transform.oy)
+    elseif layerName == "obstacles" then
+      local obs = Obstacles(tileSetInfo, transform)
+      insertDrawableEntity("obstacles", obs)
+    end
+
+  end)
 
   love.graphics.setFont(self.font)
 
@@ -91,31 +129,17 @@ function Mainstate:enter()
   local e1 = newPunk(self, 705, SCREEN_VALUES.height * 0.5)
   local e2 = newPunk(self, 705, SCREEN_VALUES.height * 0.42)
 
-  table.insert(self.entities.players, p1)
-  table.insert(self.entities.players, p2)
+  insertDrawableEntity("players", p1)
+  insertDrawableEntity("players", p2)
 
-  table.insert(self.entities.enemies, e1)
-  table.insert(self.entities.enemies, e2)
+  insertDrawableEntity("enemies", e1)
+  insertDrawableEntity("enemies", e2)
 
   for _, p in ipairs(self.entities.enemies) do
     table.insert(self.entities.characters, p)
   end
   for _, p in ipairs(self.entities.players) do
     table.insert(self.entities.characters, p)
-  end
-
-  local CharacterLayer = {
-    sprites = self.entities.characters
-  }
-
-  function CharacterLayer:draw()
-    for _, char in ipairs(self.sprites) do
-      char:draw()
-
-      if DEBUG then
-        char:drawDebug()
-      end
-    end
   end
 
   local w, h = self.tileMap:levelPixelDimensions()
@@ -125,9 +149,6 @@ function Mainstate:enter()
   self.world:add(self.upperBoundary, self.upperBoundary.x, self.upperBoundary.y, self.upperBoundary.width, self.upperBoundary.height)
   self.world:add(self.lowerBoundary, self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.width, self.lowerBoundary.height)
 
-
-  -- this adds the characters infront of the background tiles but behind the obstacles
-  self.tileMap:addLayer(CharacterLayer, 2)
 end
 
 
@@ -143,14 +164,22 @@ end
 
 function Mainstate:draw()
   self.camera:attach()
+  love.graphics.draw(self.background)
 
-  self.tileMap:draw()
+  table.sort(self.drawings, function (a, b)
+    return math.floor(a.y) < math.floor(b.y)
+  end)
+
+  for _, drawable in ipairs(self.drawings) do
+    drawable:draw()
+  end
+
   if DEBUG then
+    self.tileMap:debugDraw()
     love.graphics.line(self.upperBoundary.x, self.upperBoundary.y, self.upperBoundary.x + self.upperBoundary.width, self.upperBoundary.y + self.upperBoundary.height)
     love.graphics.line(self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.x + self.lowerBoundary.width, self.lowerBoundary.y + self.lowerBoundary.height)
   end
   self.camera:detach()
-
 
 end
 

@@ -24,9 +24,9 @@ end
 
 function Hitbox:drawDebug()
   if self.active then
-    love.graphics.rectangle("fill", self.x, self.y, self.width, self.height)
+    Rectangle.draw(self, "fill")
   else
-    love.graphics.rectangle("line", self.x, self.y, self.width, self.height)
+    Rectangle.draw(self, "line")
   end
 end
 

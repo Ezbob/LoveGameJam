@@ -2,22 +2,9 @@ local Class = require 'modules.hump.class'
 local inspect = require 'modules.inspect.inspect'
 local json = require 'modules.dkjson.dkjson'
 local StringUtils = require 'StringUtils'
-local AsepriteMetaParser = require 'AsepriteMetaParser'
 local bit = require 'bit'
 local rectangle = require "rectangle"
-
-local TiledLevelLayer = Class {}
-
-function TiledLevelLayer:init(batch, index)
-  self.spriteBatch = batch
-  self.index = index or -1
-end
-
-function TiledLevelLayer:draw()
-  if self.spriteBatch then
-    love.graphics.draw(self.spriteBatch)
-  end
-end
+local AsepriteTileset = require "tilemap.AsepriteTileset"
 
 local TiledLevel = Class {}
 
@@ -39,22 +26,26 @@ local function getPrefix(filepath)
 end
 
 local function loadJSON(self, filename)
-  local loadedJson = loadJsonFile(filename)
-  self.tileWidth = loadedJson.tilewidth
-  self.tileHeight = loadedJson.tileheight
-  self.mapWidth = loadedJson.width
-  self.mapHeight = loadedJson.height
-  self.mapJSONData = {
-    layers = loadedJson.layers,
-    tileSets = loadedJson.tilesets
-  }
+  self.mapJSONData = loadJsonFile(filename)
+  self.tileWidth = self.mapJSONData.tilewidth
+  self.tileHeight = self.mapJSONData.tileheight
+  self.mapWidth = self.mapJSONData.width
+  self.mapHeight = self.mapJSONData.height
   self.assetPrefix = getPrefix(filename)
 end
 
 function TiledLevel:init(filename)
-  self.tileSets = nil
-  self.sortedLayers = {}
   loadJSON(self, filename)
+end
+
+function TiledLevel:loadTileSets(types)
+  if types == "aseprite" then
+    self.tileSets = AsepriteTileset(self.mapJSONData.tilesets, self.assetPrefix)
+  else
+    self.tileSets = AsepriteTileset(self.mapJSONData.tilesets, self.assetPrefix)
+  end
+
+  self.tileSets:load()
 end
 
 local function parseTiledata(layers, callback)
@@ -87,64 +78,10 @@ local function parseTiledata(layers, callback)
   end
 end
 
-local function replaceExtensionWithJson(file)
-  local r = ""
-  for char in file:gmatch("[^.]+$") do
-    r = file:gsub("." .. char, ".json")
-  end
-  return r
-end
+function TiledLevel:populateLayers(layerInitializer)
+  layerInitializer = layerInitializer or function () end
 
-local function loadTileSetQuads(tileSets, assetPrefix, labelSplitter)
-  local indexedQuads = {}
-
-  for _, value in ipairs(tileSets) do
-    local jsonFilepath = table.concat({assetPrefix, replaceExtensionWithJson(value.image)}, "/")
-    local quads = AsepriteMetaParser.getIndexedQuadsFromJSON(jsonFilepath, labelSplitter)
-    local firstgid = value.firstgid
-
-    for i, quad in ipairs(quads) do
-      indexedQuads[i + (firstgid - 1)] = {
-        quad = quad,
-        image = table.concat({ assetPrefix, value.image }, "/")
-      }
-    end
-  end
-  return indexedQuads
-end
-
-local function initialSpriteBatches(indexedQuads)
-  local result = {}
-
-  for gid, quadsnshit in ipairs(indexedQuads) do
-    local img = love.graphics.newImage(quadsnshit.image)
-    result[quadsnshit.image] = love.graphics.newSpriteBatch(img)
-  end
-
-  return result
-end
-
-function TiledLevel:loadTilesFromAseprite(labelSplitter, prefix)
-  prefix = prefix or self.assetPrefix
-
-  local indexedQuads = loadTileSetQuads(self.mapJSONData.tileSets, prefix, labelSplitter)
-
-  local spriteBatches = initialSpriteBatches(indexedQuads)
-
-  self.tileSets = {
-    quadIndex = indexedQuads,
-    spriteBatches = spriteBatches
-  }
-end
-
-function TiledLevel:populateLayers()
-  if DEBUG then
-    self.debugRects = {}
-  end
   parseTiledata(self.mapJSONData.layers, function (layerIndex, gid, x, y, hflipped, vflipped, dflipped)
-    local q = self.tileSets.quadIndex[gid]
-    local batch = self.tileSets.spriteBatches[q.image]
-
     local xoffset, yoffset = 0, 0
     local xscale, yscale = 1, 1
     local rotate = 0
@@ -172,11 +109,40 @@ function TiledLevel:populateLayers()
     local xPixel = self.tileWidth * (x - 1)
     local yPixel = self.tileHeight * (y - 1)
 
-    batch:add(q.quad, xPixel, yPixel, rotate, xscale, yscale, xoffset, yoffset)
+    local tileSetInfo = self.tileSets:getTileInfoForGridId(gid)
 
-    if self.sortedLayers[layerIndex] == nil then
-      self.sortedLayers[layerIndex] = TiledLevelLayer(batch, layerIndex)
+    local transform = {x=xPixel, y=yPixel, r=rotate, sx=xscale, sy=yscale, ox=xoffset, oy=yoffset}
+
+    local layerName = self.mapJSONData.layers[layerIndex].name
+
+    layerInitializer(layerIndex, layerName, transform, tileSetInfo)
+
+  end)
+end
+
+function TiledLevel:extractCollisions(collision)
+  self.collisionLookup = {}
+  self.worldCollision = collision
+  for tileIndex, tileset in ipairs(self.mapJSONData.tilesets) do
+    if tileset.tiles then
+      local firstgid = tileset.firstgid
+      if not self.collisionLookup[tileIndex] then
+        self.collisionLookup[tileIndex] = {}
+      end
+      for i, tile in ipairs(tileset.tiles) do
+        local gid = firstgid + tile.id
+        self.collisionLookup[tileIndex][gid] = tile
+      end
     end
+  end
+
+  if DEBUG then
+    self.debugRects = {}
+  end
+
+  parseTiledata(self.mapJSONData.layers, function (layerIndex, gid, x, y)
+    local xPixel = self.tileWidth * (x - 1)
+    local yPixel = self.tileHeight * (y - 1)
 
     if self.collisionLookup and self.worldCollision then
       local layer = self.collisionLookup[layerIndex]
@@ -207,47 +173,21 @@ function TiledLevel:populateLayers()
   end)
 end
 
-function TiledLevel:extractCollisions(collision)
-  self.collisionLookup = {}
-  self.worldCollision = collision
-  for tileIndex, tileset in ipairs(self.mapJSONData.tileSets) do
-    if tileset.tiles then
-      local firstgid = tileset.firstgid
-      if not self.collisionLookup[tileIndex] then
-        self.collisionLookup[tileIndex] = {}
-      end
-      for i, tile in ipairs(tileset.tiles) do
-        local gid = firstgid + tile.id
-        self.collisionLookup[tileIndex][gid] = tile
-      end
-    end
-  end
-end
-
-function TiledLevel:draw()
-  for i, layer in ipairs(self.sortedLayers) do
-    layer:draw()
-  end
-  if DEBUG and self.debugRects then
-    for i, r in ipairs(self.debugRects) do
-      r:draw()
-    end
-  end
-end
-
-function TiledLevel:addLayer(layer, layerIndex)
-  table.insert(self.sortedLayers, layerIndex, layer)
-end
-
-function TiledLevel:getLayers()
-  return self.sortedLayers
-end
-
 -- get the pixel width and height
 function TiledLevel:levelPixelDimensions()
   local pixelWidth = self.tileWidth * self.mapWidth
   local pixelHeight = self.tileHeight * self.mapHeight
   return pixelWidth, pixelHeight
+end
+
+function TiledLevel:debugDraw()
+  if DEBUG then
+
+    for key, value in pairs(self.debugRects) do
+      value:draw()
+    end
+  end
+
 end
 
 return TiledLevel

@@ -158,7 +158,10 @@ function AsepriteMetaParser.getIndexedQuadsFromJSON(filepath, labelSplitter)
     local width = value["frame"]["w"]
     local height = value["frame"]["h"]
 
-    result[frameIndex + 1] = love.graphics.newQuad(column, row, width, height, imageSizes.width, imageSizes.height)
+    result[frameIndex + 1] = {
+      frameName = frameName,
+      quad = love.graphics.newQuad(column, row, width, height, imageSizes.width, imageSizes.height)
+    }
   end, labelSplitter)
 
   return result

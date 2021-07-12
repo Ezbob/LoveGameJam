@@ -60,6 +60,12 @@ function Char:draw()
     self.x + self.spriteOffsets.x,
     self.y + self.spriteOffsets.y
   )
+  if DEBUG then
+    Rectangle.draw(self)
+    for k,hitbox in pairs(self.hitboxes) do
+      hitbox:drawDebug()
+    end
+  end
 end
 
 function Char:setCurrentAnimation(name)
@@ -79,13 +85,6 @@ function Char:flipVertical()
   local state = self.animations:getState(self.currentAnimation)
   if state then
     state:flipV()
-  end
-end
-
-function Char:drawDebug(style)
-  Rectangle.draw(self, style)
-  for k,hitbox in pairs(self.hitboxes) do
-    hitbox:drawDebug()
   end
 end
 
