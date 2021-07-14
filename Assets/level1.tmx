@@ -10,17 +10,17 @@
   <image source="obstacles_small.png" width="256" height="64"/>
   <tile id="0" type="obstacle">
    <objectgroup draworder="index" id="2">
-    <object id="2" name="obstacle" x="8" y="29.4312" width="48" height="34.5688"/>
+    <object id="2" name="obstacle" x="8" y="30" width="48" height="33.3679"/>
    </objectgroup>
   </tile>
   <tile id="1" type="obstacle">
    <objectgroup draworder="index" id="2">
-    <object id="5" name="obstacle" x="0" y="35.7342" width="64" height="28.2658"/>
+    <object id="5" name="obstacle" x="0.120086" y="40" width="63.5" height="23.9427"/>
    </objectgroup>
   </tile>
   <tile id="2" type="obstacle">
    <objectgroup draworder="index" id="2">
-    <object id="1" name="obstacle" x="0.340245" y="21.7757" width="60" height="42.0542"/>
+    <object id="1" name="obstacle" x="0.220159" y="25.1381" width="60" height="38.6918"/>
    </objectgroup>
   </tile>
   <tile id="3" type="obstacle">

@@ -75,7 +75,7 @@
                      "name":"",
                      "objects":[
                             {
-                             "height":34.5688,
+                             "height":33.3679368796322,
                              "id":2,
                              "name":"obstacle",
                              "rotation":0,
@@ -83,7 +83,7 @@
                              "visible":true,
                              "width":48,
                              "x":8,
-                             "y":29.4312
+                             "y":30
                             }],
                      "opacity":1,
                      "type":"objectgroup",
@@ -102,15 +102,15 @@
                      "name":"",
                      "objects":[
                             {
-                             "height":28.2658,
+                             "height":23.942692766676,
                              "id":5,
                              "name":"obstacle",
                              "rotation":0,
                              "type":"",
                              "visible":true,
-                             "width":64,
-                             "x":0,
-                             "y":35.7342
+                             "width":63.5,
+                             "x":0.120086312036776,
+                             "y":40
                             }],
                      "opacity":1,
                      "type":"objectgroup",
@@ -129,15 +129,15 @@
                      "name":"",
                      "objects":[
                             {
-                             "height":42.0542,
+                             "height":38.6917832629702,
                              "id":1,
                              "name":"obstacle",
                              "rotation":0,
                              "type":"",
                              "visible":true,
                              "width":60,
-                             "x":0.340245,
-                             "y":21.7757
+                             "x":0.220158687963224,
+                             "y":25.1381167370297
                             }],
                      "opacity":1,
                      "type":"objectgroup",
