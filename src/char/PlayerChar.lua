@@ -11,7 +11,7 @@ local PlayerChar = Class {
 
 function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid, width, height)
   width = width or 25
-  height = height or 60
+  height = height or 45
   collision = collision
   sheet = sheet
   grid = grid
@@ -21,7 +21,7 @@ function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid,
   Char.init(self, x, y, width, height,
     AnimationSet(sheet, {width = 76, height = 104}),
     'idle',
-    {x = -width, y =  -(height - 15)}
+    {x = -width, y =  -(height + 10)}
   )
 
   self.playerId = id
@@ -31,10 +31,11 @@ function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid,
   self.isPunching = false
   self.isKicking = false
 
-  self:addHitbox("punch_right", width + 10, 12, 12, 12)
-  self:addHitbox("punch_left", -22, 12, 12, 12)
-  self:addHitbox("kick_right", width + 10, 24, 15, 12)
-  self:addHitbox("kick_left", -25, 24, 15, 12)
+  self:addHitbox("body", 0, 5, width, width + 10)
+  self:addHitbox("punch_right", width + 10, 3, 12, 12)
+  self:addHitbox("punch_left", -22, 3, 12, 12)
+  self:addHitbox("kick_right", width + 10, 15, 15, 12)
+  self:addHitbox("kick_left", -25, 15, 15, 12)
 
   self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
   self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)
@@ -59,7 +60,6 @@ local function playerCollisionFilter(me, other)
   if other.name == "punk" or other.name == "heavy" or other.name == "player" then
       return "cross"
   end
-
   return "slide"
 end
 
@@ -67,8 +67,6 @@ function PlayerChar:move(relative_x, relative_y)
   local actualX, actualY, col, len = self.collision:move(self,
       self.x + relative_x, self.y + relative_y,
       playerCollisionFilter)
-
-  --print(self.x, self.y, relative_x, relative_y, actualX, actualY)
 
   self.x = actualX
   self.y = actualY

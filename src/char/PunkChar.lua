@@ -2,7 +2,6 @@ local Char = require "char.Char"
 local Class = require "modules.hump.class"
 local inspect = require "modules.inspect.inspect"
 local AnimationSet = require "char.AnimationSet"
-local Rectangle = require "rectangle"
 
 local PunkChar = Class {
   __includes = Char,
@@ -11,7 +10,7 @@ local PunkChar = Class {
 
 function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width, height)
   width = width or 25
-  height = height or 60
+  height = height or 45
   collision = collision
   sheet = sheet
   grid = grid
@@ -19,7 +18,7 @@ function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width
 
   Char.init(self, x, y, width, height, AnimationSet(sheet, {width = 76, height = 104}),
       'idle',
-      {x = -width, y =  -(height - 15)}
+      {x = -width, y =  -(height + 10)}
   )
 
   self.x = x
@@ -28,11 +27,11 @@ function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width
   self.height = height
   self.collision = collision
 
-  self:addHitbox("punch_right", width + 10, 12, 12, 12)
-  self:addHitbox("punch_left", -22, 12, 12, 12)
-  self:addHitbox("kick_right", width + 10, 24, 15, 12)
-  self:addHitbox("kick_left", -25, 24, 15, 12)
-
+  self:addHitbox("body", 0, 5, width, width + 10)
+  self:addHitbox("punch_right", width + 10, 8, 12, 12)
+  self:addHitbox("punch_left", -22, 8, 12, 12)
+  self:addHitbox("kick_right", width + 10, 20, 15, 12)
+  self:addHitbox("kick_left", -25, 20, 15, 12)
 
   self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
   self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)

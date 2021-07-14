@@ -62,7 +62,7 @@ function Char:draw()
   )
   if DEBUG then
     Rectangle.draw(self)
-    for k,hitbox in pairs(self.hitboxes) do
+    for k, hitbox in pairs(self.hitboxes) do
       hitbox:drawDebug()
     end
   end
@@ -92,7 +92,7 @@ function Char:addHitbox(tag, x_offset, y_offset, width, height)
   if self.hitboxes == nil then
     self.hitboxes = {}
   end
-  self.hitboxes[tag] = Hitbox(tag, self.x + x_offset, self.y + y_offset, x_offset, y_offset, width, height)
+  self.hitboxes[tag] = Hitbox(tag, math.floor(self.x + x_offset), math.floor(self.y + y_offset), x_offset, y_offset, width, height)
 end
 
 function Char:removeHitbox(tag)
