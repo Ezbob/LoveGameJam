@@ -52,4 +52,8 @@ function Rectangle:draw(style)
   love.graphics.rectangle(style or "line", self.x, self.y, self.width, self.height)
 end
 
+function Rectangle:midPoint()
+  return self.x + (self.width / 2), self.y + (self.height / 2)
+end
+
 return Rectangle

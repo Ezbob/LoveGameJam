@@ -7,8 +7,8 @@ local Camera = require "modules.hump.camera"
 local PlayerChar = require "char.PlayerChar"
 local PunkChar = require "char.PunkChar"
 local TiledLevel = require "tilemap.TiledLevel"
-local rectangle        = require "rectangle"
-
+local rectangle  = require "rectangle"
+local CameraPath = require "CameraPath"
 
 local Mainstate = Class {}
 
@@ -105,7 +105,7 @@ function Mainstate:enter()
   self.tileMap = TiledLevel('Assets/level1.json')
   self.tileMap:loadTileSets('aseprite')
   self.tileMap:extractCollisions(self.world)
-  self.tileMap:populateLayers(function (layerIndex, layerName, transform, tileSetInfo)
+  self.tileMap:populateLayers(function(layerIndex, layerName, transform, tileSetInfo)
 
     if layerName == "background" then
       if not self.background then
@@ -142,6 +142,8 @@ function Mainstate:enter()
     table.insert(self.entities.characters, p)
   end
 
+  self.cameraPath = CameraPath(self.camera, {e1, p1}, Camera.smooth.damped(3))
+
   local w, h = self.tileMap:levelPixelDimensions()
   self.upperBoundary = { x = 0, y = self.tileMap.tileWidth * 2, name = "upperBoundary", width = w, height = 2 }
   self.lowerBoundary = { x = 0, y = h - (self.tileMap.tileWidth * 2), name = "lowerBoundary", width = w, height = 2}
@@ -149,6 +151,9 @@ function Mainstate:enter()
   self.world:add(self.upperBoundary, self.upperBoundary.x, self.upperBoundary.y, self.upperBoundary.width, self.upperBoundary.height)
   self.world:add(self.lowerBoundary, self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.width, self.lowerBoundary.height)
 
+  self.camera:lookAt(p1:midPoint())
+
+  self.defaultCameraSmoother = Camera.smooth.linear(400)
 end
 
 
@@ -157,8 +162,13 @@ function Mainstate:update(dt)
     char:update(dt)
   end
 
-  local p1 = self.entities.players[1]
-  self.camera:lookAt(p1.x + (p1.width / 2), p1.y + (p1.height / 2))
+  if self.cameraPath:isFinished() then
+    local p1 = self.entities.players[1]
+    self.camera.smoother = self.defaultCameraSmoother
+    self.camera:lockPosition(p1:midPoint())
+  else
+    self.cameraPath:update(dt)
+  end
 end
 
 
