@@ -8,8 +8,10 @@ local PlayerChar = require "char.PlayerChar"
 local PunkChar = require "char.PunkChar"
 local TiledLevel = require "tilemap.TiledLevel"
 local rectangle  = require "rectangle"
-local CameraPath = require "CameraPath"
+local CameraPath = require "camera.CameraPath"
+local CameraHold = require "camera.CameraHold"
 local Timer = require "modules.hump.timer"
+local CameraStateMachine = require "camera.CameraStateMachine"
 
 local Mainstate = Class {}
 
@@ -145,6 +147,13 @@ function Mainstate:enter()
     table.insert(self.entities.characters, p)
   end
 
+  self.cameraStates = CameraStateMachine()
+
+  self.cameraStates:addPath("normal", CameraHold(self.camera, p1, Camera.smooth.linear(400)))
+  self.cameraStates:addPath("enemyPan", CameraPath(self.camera, {e1, e2, p1, p2}, Camera.smooth.damped(3)))
+
+  self.cameraStates:setCurrentPath("enemyPan")
+
   self.cameraPath = CameraPath(self.camera, {e1, p1}, Camera.smooth.damped(3))
 
   local w, h = self.tileMap:levelPixelDimensions()
@@ -179,13 +188,11 @@ function Mainstate:update(dt)
     char:update(dt)
   end
 
-  if self.cameraPath:isFinished() then
-    local p1 = self.entities.players[1]
-    self.camera.smoother = self.defaultCameraSmoother
-    self.camera:lockPosition(p1:midPoint())
-  else
-    self.cameraPath:update(dt)
+  if self.cameraStates:isCurrentPathFinished() then
+    self.cameraStates:setCurrentPath('normal')
   end
+
+  self.cameraStates:update(dt)
   self.timer:update(dt)
 end
 
