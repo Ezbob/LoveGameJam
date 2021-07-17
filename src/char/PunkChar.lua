@@ -35,13 +35,38 @@ function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width
 
   self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
   self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)
-  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1)
-  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1)
+  self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1, function ()
+    self:punchEnd()
+  end)
+  self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1, function ()
+    self:kickEnd()
+  end)
   self.animations:addNewState("death", grid[animationTag]["death"], 0.1, "pauseAtEnd")
   self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
 
   self.collision:add(self, self.x, self.y, self.width, self.height)
 end
 
+function PunkChar:punchEnd()
+  self.isPunching = false
+  local hitbox = nil
+  if self.facingRight then
+    hitbox = self.hitboxes['punch_right']
+  else
+    hitbox = self.hitboxes['punch_left']
+  end
+  self.signal:emit('punch', self, hitbox)
+end
+
+function PunkChar:kickEnd()
+  self.isKicking = false
+  local hitbox = nil
+  if self.facingRight then
+    hitbox = self.hitboxes['kick_right']
+  else
+    hitbox = self.hitboxes['kick_left']
+  end
+  self.signal:emit('kick', self, hitbox)
+end
 
 return PunkChar

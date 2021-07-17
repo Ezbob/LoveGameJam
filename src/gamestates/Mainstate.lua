@@ -9,6 +9,7 @@ local PunkChar = require "char.PunkChar"
 local TiledLevel = require "tilemap.TiledLevel"
 local rectangle  = require "rectangle"
 local CameraPath = require "CameraPath"
+local Timer = require "modules.hump.timer"
 
 local Mainstate = Class {}
 
@@ -18,6 +19,7 @@ function Mainstate:init()
   self.entities = nil
   self.signal = nil
   self.world = nil
+  self.timer = nil
   self.font = love.graphics.newFont("Assets/PressStart2P.ttf", DEBUG_FONT_SIZE)
   self.assets = {
     character = {
@@ -101,6 +103,7 @@ function Mainstate:enter()
   self.world = bump.newWorld()
   self.signal = Signal()
   self.camera = Camera(0, 0)
+  self.timer = Timer()
 
   self.tileMap = TiledLevel('Assets/level1.json')
   self.tileMap:loadTileSets('aseprite')
@@ -154,6 +157,20 @@ function Mainstate:enter()
   self.camera:lookAt(p1:midPoint())
 
   self.defaultCameraSmoother = Camera.smooth.linear(400)
+
+  self.signal:register("punch", function(player, hitbox)
+    hitbox:setActive(true)
+    self.timer:after(0.1, function ()
+      hitbox:setActive(false)
+    end)
+  end)
+
+  self.signal:register("kick", function(player, hitbox)
+    hitbox:setActive(true)
+    self.timer:after(0.1, function ()
+      hitbox:setActive(false)
+    end)
+  end)
 end
 
 
@@ -169,6 +186,7 @@ function Mainstate:update(dt)
   else
     self.cameraPath:update(dt)
   end
+  self.timer:update(dt)
 end
 
 

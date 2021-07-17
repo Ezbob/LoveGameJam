@@ -75,23 +75,23 @@ end
 function PlayerChar:punchEnd()
   self.isPunching = false
   local hitbox = nil
-  if self:isFacingRight() then
+  if self.facingRight then
     hitbox = self.hitboxes['punch_right']
   else
     hitbox = self.hitboxes['punch_left']
   end
-  self.signal:emit('player_punch', self, hitbox)
+  self.signal:emit('punch', self, hitbox)
 end
 
 function PlayerChar:kickEnd()
   self.isKicking = false
   local hitbox = nil
-  if self:isFacingRight() then
+  if self.facingRight then
     hitbox = self.hitboxes['kick_right']
   else
     hitbox = self.hitboxes['kick_left']
   end
-  self.signal:emit('player_kick', self, hitbox)
+  self.signal:emit('kick', self, hitbox)
 end
 
 local function update_as_left(delta_time)
