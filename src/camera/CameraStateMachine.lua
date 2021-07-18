@@ -7,8 +7,11 @@ function CameraStateMachine:init()
   self.currentKey = nil
 end
 
-function CameraStateMachine:setCurrentPath(key)
+function CameraStateMachine:setCurrentPath(key, reset)
   self.currentKey = key
+  if reset and self.paths[self.currentKey] then
+    self.paths[self.currentKey]:reset()
+  end
 end
 
 function CameraStateMachine:addPath(key, cameraPath)

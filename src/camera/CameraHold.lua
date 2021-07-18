@@ -1,6 +1,9 @@
 local Class = require "modules.hump.class"
+local CameraState = require "camera.CameraState"
 
-local CameraHold = Class {}
+local CameraHold = Class {
+  __includes = CameraState
+}
 
 function CameraHold:init(camera, point, smoother)
   self.camera = camera
@@ -13,13 +16,6 @@ function CameraHold:update()
     self.camera.smoother = self.smoother
     self.camera:lockPosition(self.point.x, self.point.y)
   end
-end
-
-function CameraHold:isFinished()
-  return true
-end
-
-function CameraHold:reset()
 end
 
 return CameraHold

@@ -149,8 +149,8 @@ function Mainstate:enter()
 
   self.cameraStates = CameraStateMachine()
 
-  self.cameraStates:addPath("normal", CameraHold(self.camera, p1, Camera.smooth.linear(400)))
-  self.cameraStates:addPath("enemyPan", CameraPath(self.camera, {e1, e2, p1, p2}, Camera.smooth.damped(3)))
+  self.cameraStates:addPath("player1follow", CameraHold(self.camera, p1, Camera.smooth.linear(400)))
+  self.cameraStates:addPath("enemyPan", CameraPath(self.camera, {e1, e2, p1}, Camera.smooth.damped(3), 6))
 
   self.cameraStates:setCurrentPath("enemyPan")
 
@@ -189,7 +189,7 @@ function Mainstate:update(dt)
   end
 
   if self.cameraStates:isCurrentPathFinished() then
-    self.cameraStates:setCurrentPath('normal')
+    self.cameraStates:setCurrentPath('player1follow')
   end
 
   self.cameraStates:update(dt)

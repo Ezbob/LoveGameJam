@@ -1,13 +1,17 @@
 local Class = require "modules.hump.class"
 local veclight = require "modules.hump.vector-light"
+local CameraState = require "camera.CameraState"
 
-local CameraPath = Class {}
+local CameraPath = Class {
+  __includes = CameraState
+}
 
-function CameraPath:init(camera, points, smoother)
+function CameraPath:init(camera, points, smoother, switchLimit)
   self.camera = camera
   self.points = points
   self.smoother = smoother
   self.currentPoint = 1
+  self.switchLimit = switchLimit or 4
   self.done = false
 end
 
@@ -18,7 +22,7 @@ function CameraPath:update()
     self.camera:lockPosition(point.x, point.y)
 
     local cx, cy = self.camera:position()
-    if veclight.dist(cx, cy, point.x, point.y) < 4 then
+    if veclight.dist(cx, cy, point.x, point.y) < self.switchLimit then
       self.currentPoint = self.currentPoint + 1
     end
   else
