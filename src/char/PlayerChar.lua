@@ -201,6 +201,10 @@ function PlayerChar:update(dt)
 
   local x, y, punch, kick = control(dt)
 
+  if x ~= 0 or y ~= 0 or punch or kick then
+    self.signal:emit('player_control', self)
+  end
+
   self:move(x, y)
 
   local nextAnimation = "idle"

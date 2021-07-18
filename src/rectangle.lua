@@ -56,4 +56,9 @@ function Rectangle:midPoint()
   return self.x + (self.width / 2), self.y + (self.height / 2)
 end
 
+function Rectangle:midPointVector()
+  local x, y = self:midPoint()
+  return {x = x, y = y}
+end
+
 return Rectangle

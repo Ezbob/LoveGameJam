@@ -148,13 +148,10 @@ function Mainstate:enter()
   end
 
   self.cameraStates = CameraStateMachine()
-
-  self.cameraStates:addPath("player1follow", CameraHold(self.camera, p1, Camera.smooth.linear(400)))
-  self.cameraStates:addPath("enemyPan", CameraPath(self.camera, {e1, e2, p1}, Camera.smooth.damped(3), 6))
-
-  self.cameraStates:setCurrentPath("enemyPan")
-
-  self.cameraPath = CameraPath(self.camera, {e1, p1}, Camera.smooth.damped(3))
+  self.cameraStates:addCameraState("player1follow", CameraHold(self.camera, p1, Camera.smooth.damped(10)))
+  self.cameraStates:addCameraState("player2follow", CameraHold(self.camera, p2, Camera.smooth.damped(10)))
+  self.cameraStates:addCameraState("enemyPan", CameraPath(self.camera, {e1, e2, p1}, Camera.smooth.damped(3), 6))
+  self.cameraStates:setCurrentState("enemyPan")
 
   local w, h = self.tileMap:levelPixelDimensions()
   self.upperBoundary = { x = 0, y = self.tileMap.tileWidth * 2, name = "upperBoundary", width = w, height = 2 }
@@ -164,8 +161,6 @@ function Mainstate:enter()
   self.world:add(self.lowerBoundary, self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.width, self.lowerBoundary.height)
 
   self.camera:lookAt(p1:midPoint())
-
-  self.defaultCameraSmoother = Camera.smooth.linear(400)
 
   self.signal:register("punch", function(player, hitbox)
     hitbox:setActive(true)
@@ -189,7 +184,7 @@ function Mainstate:update(dt)
   end
 
   if self.cameraStates:isCurrentPathFinished() then
-    self.cameraStates:setCurrentPath('player1follow')
+    self.cameraStates:setCurrentState('player1follow')
   end
 
   self.cameraStates:update(dt)
