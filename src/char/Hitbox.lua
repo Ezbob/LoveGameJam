@@ -30,25 +30,4 @@ function Hitbox:drawDebug()
   end
 end
 
--- Active intersection test
--- returns -1 iff two hitboxes are intersecting and the this rectangle is active
--- return 1 iff two hitboxes are intersecting and the other rectangle is actve
--- return 3 iff two hitboxes are intersecting and the both rectangle is actve
--- return 0 otherwise
-function Hitbox:activeIntersectTest(otherHitbox)
-  if not self.isIntersectingRectangles(otherHitbox) then
-    return 0
-  else
-    if self.active and otherHitbox.active then
-      return 3
-    elseif self.active then
-      return -1
-    elseif otherHitbox.active then
-      return 1
-    else
-      return 0
-    end
-  end
-end
-
 return Hitbox

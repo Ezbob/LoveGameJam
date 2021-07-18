@@ -6,11 +6,12 @@ local Class = require "modules.hump.class"
 local Char = Class {
   __includes = Rectangle,
   name = "char", -- collision id
-  spriteOffsets = nil
 }
 
-function Char:init(x, y, w, h, animationSet, currentAnimation, spriteOffsets)
+function Char:init(x, y, w, h, animationSet, currentAnimation, spriteOffsets, health)
   Rectangle.init(self, x, y, w, h)
+
+  self.health = health or 100
   self.animations = animationSet
   self.spriteOffsets = spriteOffsets or {x = -w, y = -h }
   self.alive = true
@@ -24,6 +25,10 @@ function Char:update(dt)
   for _, hitbox in pairs(self.hitboxes) do
     hitbox.x = self.x + hitbox.offset_x
     hitbox.y = self.y + hitbox.offset_y
+  end
+
+  if self.health < 0 then
+    self:die()
   end
 end
 
@@ -103,12 +108,17 @@ function Char:getHitbox(tag)
   return self.hitboxes[tag]
 end
 
+function Char:getHitboxes()
+  return self.hitboxes
+end
+
 function Char:isAlive()
   return self.alive
 end
 
 function Char:die()
   self.alive = false
+  self:setCurrentAnimation('death')
 end
 
 return Char

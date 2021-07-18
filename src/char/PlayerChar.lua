@@ -51,11 +51,6 @@ function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid,
   self.collision:add(self, self.x, self.y, self.width, self.height)
 end
 
-function PlayerChar:die()
-  Char.die(self)
-  self:setCurrentAnimation('death')
-end
-
 local function playerCollisionFilter(me, other)
   if other.name == "punk" or other.name == "heavy" or other.name == "player" then
       return "cross"

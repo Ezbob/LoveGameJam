@@ -39,6 +39,22 @@ function Mainstate:init()
   }
 end
 
+local function hitboxHandler(state, eventName, player, hitbox)
+
+  for i, e in ipairs(state.entities.enemies) do
+    local body = e:getHitbox("body")
+
+    if e:isAlive() and hitbox:isIntersectingRectangles(body) then
+      if eventName == "kick" then
+        e.health = e.health - 25;
+      elseif eventName == "punch" then
+        e.health = e.health - 10;
+      end
+      break
+    end
+  end
+end
+
 local function newPlayer(self, id, x, y)
   local aniTag = "player1"
   if id > 1 then
@@ -162,19 +178,8 @@ function Mainstate:enter()
 
   self.camera:lookAt(p1:midPoint())
 
-  self.signal:register("punch", function(player, hitbox)
-    hitbox:setActive(true)
-    self.timer:after(0.1, function ()
-      hitbox:setActive(false)
-    end)
-  end)
-
-  self.signal:register("kick", function(player, hitbox)
-    hitbox:setActive(true)
-    self.timer:after(0.1, function ()
-      hitbox:setActive(false)
-    end)
-  end)
+  self.signal:register("punch", function(player, hitbox) hitboxHandler(self, "punch", player, hitbox) end)
+  self.signal:register("kick", function(player, hitbox) hitboxHandler(self, "kick", player, hitbox) end)
 end
 
 
