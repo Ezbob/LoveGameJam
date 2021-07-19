@@ -15,6 +15,7 @@ function Char:init(x, y, w, h, animationSet, currentAnimation, spriteOffsets, he
   self.animations = animationSet
   self.spriteOffsets = spriteOffsets or {x = -w, y = -h }
   self.alive = true
+  self.stunned = false
   self.facingRight = true
   self.currentAnimation = currentAnimation or 'idle'
 end
@@ -119,6 +120,11 @@ end
 function Char:die()
   self.alive = false
   self:setCurrentAnimation('death')
+end
+
+function Char:stun()
+  self.stunned = true
+  self:setCurrentAnimation('stun')
 end
 
 return Char

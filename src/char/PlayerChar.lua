@@ -46,7 +46,9 @@ function PlayerChar:init(id, x, y, animationTag, signal, collision, sheet, grid,
     self:kickEnd()
   end)
   self.animations:addNewState("death", grid[animationTag]["death"], 0.1, "pauseAtEnd")
-  self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
+  self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1, function ()
+    self:setCurrentAnimation("idle")
+  end)
 
   self.collision:add(self, self.x, self.y, self.width, self.height)
 end

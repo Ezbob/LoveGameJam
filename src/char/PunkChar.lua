@@ -42,9 +42,15 @@ function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width
     self:kickEnd()
   end)
   self.animations:addNewState("death", grid[animationTag]["death"], 0.4, "pauseAtEnd")
-  self.animations:addNewState("stun", grid[animationTag]["stun"], 0.1)
+  self.animations:addNewState("stun", grid[animationTag]["stun"], 0.2, function ()
+    self:stunEnd()
+  end)
 
   self.collision:add(self, self.x, self.y, self.width, self.height)
+end
+
+function PunkChar:stunEnd()
+  self:setCurrentAnimation("idle")
 end
 
 function PunkChar:punchEnd()
