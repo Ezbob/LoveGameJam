@@ -147,7 +147,7 @@ function Mainstate:enter()
 
   love.graphics.setFont(self.font)
 
-  --self.camera:zoom(2)
+  self.camera:zoom(2)
 
   local p1 = newPlayer(self, 1, 100, SCREEN_VALUES.height * 0.45)
   local p2 = newPlayer(self, 2, 100, SCREEN_VALUES.height * 0.35)
