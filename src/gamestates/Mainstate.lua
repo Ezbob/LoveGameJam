@@ -231,9 +231,7 @@ function Mainstate:draw()
     love.graphics.line(p1.x - 200, 0, p1.x - 200, SCREEN_VALUES.height)
   end
 
-
   self.camera:detach()
-
 end
 
 

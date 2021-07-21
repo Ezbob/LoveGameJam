@@ -80,6 +80,10 @@ function Char:setCurrentAnimation(name)
   end
 end
 
+function Char:getCurrentAnimation()
+  return self.currentAnimation
+end
+
 function Char:flipHorizontal()
   local state = self.animations:getState(self.currentAnimation)
   if state then

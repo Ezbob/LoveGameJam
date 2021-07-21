@@ -61,9 +61,17 @@ local function playerCollisionFilter(me, other)
 end
 
 function PlayerChar:move(relative_x, relative_y)
+  self:setCurrentAnimation('walk')
+
   local actualX, actualY, col, len = self.collision:move(self,
       self.x + relative_x, self.y + relative_y,
       playerCollisionFilter)
+
+  if self.x < actualX then
+    self:faceRight()
+  elseif self.x > actualX then
+    self:faceLeft()
+  end
 
   self.x = actualX
   self.y = actualY

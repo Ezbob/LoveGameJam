@@ -35,6 +35,9 @@ local function triggeredEnemies(enemies, players)
 		if currentEnemy:isAlive() then
 			local ex = currentEnemy.x
 
+			-- Resets non-triggered enemies
+			currentEnemy:setCurrentAnimation('idle')
+
 			for pi, currentPlayer in ipairs(players) do
 
 				if currentPlayer:isAlive() then
@@ -59,19 +62,24 @@ function AI:update(dt)
 	for enemy, player in triggeredEnemies(self.entities.enemies, self.entities.players) do
 
 			local ex, ey = enemy:getPosition()
-			local ew, eh = enemy:getDimensions()
 			local px, py = player:getPosition()
 			local pw, ph = player:getDimensions()
 
 			if not (
 				ex > px + pw + self.enemy_dead_zone_x or
-				ex < px - self.enemy_dead_zone_x or
+				ex < px - pw - self.enemy_dead_zone_x or
 				ey > py + pw + self.enemy_dead_zone_y or
-				ey < py - self.enemy_dead_zone_y
+				ey < py - pw - self.enemy_dead_zone_y
 				) then
 				enemy:stop()
 			else
-				local x, y = vector.mul(dt, vector.mul(enemy.vx, vector.normalize(vector.sub(px, py, ex, ey))))
+				local x, y = vector.mul(dt,
+					vector.mul(enemy.vx,
+						vector.normalize(
+							vector.sub(px, py, ex, ey)
+						)
+					)
+				)
 				enemy:move(x,y)
 			end
 
