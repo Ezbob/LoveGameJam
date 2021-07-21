@@ -1,8 +1,17 @@
 local rectangle = require "rectangle"
-local AI = {
+local Class = require "modules.hump.class"
+local inspect = require "modules.inspect.inspect"
+local vector = require "modules.hump.vector-light"
+
+local AI = Class {
 	enemy_dead_zone_y = 15,
 	enemy_dead_zone_x = 15
 }
+
+function AI:init(entities, timer)
+	self.entities = entities
+	self.timer = timer
+end
 
 function AI:attack(currentEnemy, timer)
 	local choice = math.random(0, 3)
@@ -13,9 +22,103 @@ function AI:attack(currentEnemy, timer)
 	end
 end
 
+local function triggeredEnemies(enemies, players)
+	local i = 0
+	local n = table.getn(enemies)
 
-function AI:update(dt, scoreTable, timer)
+	return function ()
+		i = i + 1
+		if i > n then return end
 
+		local currentEnemy = enemies[i]
+
+		if currentEnemy:isAlive() then
+			local ex = currentEnemy.x
+
+			for pi, currentPlayer in ipairs(players) do
+
+				if currentPlayer:isAlive() then
+					local px = currentPlayer.x
+					local pw = currentPlayer.width
+
+					local lowerDetectionBoundary = px - DETECTION_ZONE_WIDTH
+					local upperDetectionBoundary = px + pw + DETECTION_ZONE_WIDTH
+
+					if lowerDetectionBoundary < ex and ex <= upperDetectionBoundary then
+						return currentEnemy, currentPlayer
+					end
+				end
+			end
+
+		end
+	end
+end
+
+function AI:update(dt)
+
+	for enemy, player in triggeredEnemies(self.entities.enemies, self.entities.players) do
+
+			local ex, ey = enemy:getPosition()
+			local ew, eh = enemy:getDimensions()
+			local px, py = player:getPosition()
+			local pw, ph = player:getDimensions()
+
+			if not (
+				ex > px + pw + self.enemy_dead_zone_x or
+				ex < px - self.enemy_dead_zone_x or
+				ey > py + pw + self.enemy_dead_zone_y or
+				ey < py - self.enemy_dead_zone_y
+				) then
+				enemy:stop()
+			else
+				local x, y = vector.mul(dt, vector.mul(enemy.vx, vector.normalize(vector.sub(px, py, ex, ey))))
+				enemy:move(x,y)
+			end
+
+	end
+
+	--[[
+	for i, currentEnemy in ipairs(self.entities.enemies) do
+		if currentEnemy:isAlive() then
+			local ex, ey = currentEnemy:getPosition()
+			local ew, eh = currentEnemy:getDimensions()
+			for pi, currentPlayer in ipairs(self.entities.players) do
+
+				if currentPlayer:isAlive() then
+					local px, py = currentPlayer:getPosition()
+					local pw, ph = currentPlayer:getDimensions()
+
+					local lowerDetectionBoundary = px - DETECTION_ZONE_WIDTH
+					local upperDetectionBoundary = px + pw + DETECTION_ZONE_WIDTH
+
+					if lowerDetectionBoundary < ex and ex <= upperDetectionBoundary then
+						return currentEnemy, currentPlayer
+					end
+				end
+			end
+
+
+			local lowerDetectionBoundary = px - DETECTION_ZONE_WIDTH
+			local upperDetectionBoundary = px + pw + DETECTION_ZONE_WIDTH
+
+			if lowerDetectionBoundary < ex and ex <= upperDetectionBoundary then
+				if not (
+					ex > px + pw + self.enemy_dead_zone_x or
+					ex < px - self.enemy_dead_zone_x or
+					ey > py + pw + self.enemy_dead_zone_y or
+					ey < py - self.enemy_dead_zone_y
+					) then
+				
+				else
+					local x, y = vector.mul(dt, vector.mul(currentEnemy.vx, vector.normalize(vector.sub(px, py, ex, ey))))
+					currentEnemy:move(x,y)
+				end
+			end
+
+		end
+	end
+--]]
+	--[[
 	for i, currentEnemy in ipairs(ENTITIES.enemies) do
 
 		currentEnemy.animation:update(dt)
@@ -124,6 +227,7 @@ function AI:update(dt, scoreTable, timer)
 			currentEnemy:death()
 		end
 	end
+	--]]
 end
 
 return AI

@@ -13,6 +13,8 @@ local CameraHold = require "camera.CameraHold"
 local Timer = require "modules.hump.timer"
 local CameraStateMachine = require "camera.CameraStateMachine"
 
+local AI = require "AI"
+
 local Mainstate = Class {}
 
 local DEBUG_FONT_SIZE = 16
@@ -91,6 +93,24 @@ local function newPunk(self, x, y)
   return res
 end
 
+local Obstacles = Class{__includes=rectangle}
+
+function Obstacles:init(tileInfo, transform)
+  self.image = tileInfo.image
+  self.quad = tileInfo.quad
+  self.transform = transform
+
+  local _, _, w, h = self.quad:getViewport()
+  rectangle.init(self, self.transform.x, self.transform.y, w, h)
+end
+
+function Obstacles:draw()
+  love.graphics.draw(self.image, self.quad, self.transform.x, self.transform.y, self.transform.r, self.transform.sx, self.transform.sy, self.transform.ox, self.transform.oy)
+  if DEBUG then
+    rectangle.draw(self)
+  end
+end
+
 function Mainstate:enter()
   self.entities = {
     characters = {},
@@ -103,24 +123,6 @@ function Mainstate:enter()
   local function insertDrawableEntity(key, entry)
     table.insert(self.entities[key], entry)
     table.insert(self.drawings, entry)
-  end
-
-  local Obstacles = Class{__includes=rectangle}
-
-  function Obstacles:init(tileInfo, transform)
-    self.image = tileInfo.image
-    self.quad = tileInfo.quad
-    self.transform = transform
-
-    local _, _, w, h = self.quad:getViewport()
-    rectangle.init(self, self.transform.x, self.transform.y, w, h)
-  end
-
-  function Obstacles:draw()
-    love.graphics.draw(self.image, self.quad, self.transform.x, self.transform.y, self.transform.r, self.transform.sx, self.transform.sy, self.transform.ox, self.transform.oy)
-    if DEBUG then
-      rectangle.draw(self)
-    end
   end
 
   self.world = bump.newWorld()
@@ -185,6 +187,8 @@ function Mainstate:enter()
 
   self.signal:register("punch", function(player, hitbox) hitboxHandler(self, "punch", player, hitbox) end)
   self.signal:register("kick", function(player, hitbox) hitboxHandler(self, "kick", player, hitbox) end)
+
+  self.ai = AI(self.entities, self.timer)
 end
 
 
@@ -199,6 +203,8 @@ function Mainstate:update(dt)
 
   self.cameraStates:update(dt)
   self.timer:update(dt)
+
+  self.ai:update(dt)
 end
 
 
@@ -218,9 +224,17 @@ function Mainstate:draw()
     self.tileMap:debugDraw()
     love.graphics.line(self.upperBoundary.x, self.upperBoundary.y, self.upperBoundary.x + self.upperBoundary.width, self.upperBoundary.y + self.upperBoundary.height)
     love.graphics.line(self.lowerBoundary.x, self.lowerBoundary.y, self.lowerBoundary.x + self.lowerBoundary.width, self.lowerBoundary.y + self.lowerBoundary.height)
+
+    local p1 = self.entities.players[1]
+
+    love.graphics.line(p1.x + p1.width + 200, 0, p1.x + p1.width + 200, SCREEN_VALUES.height)
+    love.graphics.line(p1.x - 200, 0, p1.x - 200, SCREEN_VALUES.height)
   end
+
+
   self.camera:detach()
 
 end
+
 
 return Mainstate

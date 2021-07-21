@@ -27,6 +27,9 @@ function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width
   self.height = height
   self.collision = collision
 
+  self.vx = 150
+  self.vy = 150
+
   self:addHitbox("body", 0, 5, width, width + 10)
   self:addHitbox("punch_right", width + 10, 8, 12, 12)
   self:addHitbox("punch_left", -22, 8, 12, 12)
@@ -36,43 +39,39 @@ function PunkChar:init(x, y, animationTag, signal, collision, sheet, grid, width
   self.animations:addNewState("idle", grid[animationTag]["idle"], 0.5)
   self.animations:addNewState("walk", grid[animationTag]["walk"], 0.1)
   self.animations:addNewState("punch", grid[animationTag]["punch"], 0.1, function ()
-    self:punchEnd()
+    self.isPunching = false
   end)
   self.animations:addNewState("kick", grid[animationTag]["kick"], 0.1, function ()
-    self:kickEnd()
+    self.isKicking = false
   end)
   self.animations:addNewState("death", grid[animationTag]["death"], 0.4, "pauseAtEnd")
   self.animations:addNewState("stun", grid[animationTag]["stun"], 0.2, function ()
-    self:stunEnd()
+    self:setCurrentAnimation("idle")
+    self.stunned = false
   end)
 
   self.collision:add(self, self.x, self.y, self.width, self.height)
 end
 
-function PunkChar:stunEnd()
-  self:setCurrentAnimation("idle")
+local function playerCollisionFilter(me, other)
+  if other.name == "punk" or other.name == "heavy" or other.name == "player" then
+      return "cross"
+  end
+  return "slide"
 end
 
-function PunkChar:punchEnd()
-  self.isPunching = false
-  local hitbox = nil
-  if self.facingRight then
-    hitbox = self.hitboxes['punch_right']
-  else
-    hitbox = self.hitboxes['punch_left']
-  end
-  self.signal:emit('punch', self, hitbox)
+function PunkChar:move(relative_x, relative_y)
+  self:setCurrentAnimation('walk')
+  local actualX, actualY, col, len = self.collision:move(self,
+      self.x + relative_x, self.y + relative_y,
+      playerCollisionFilter)
+
+  self.x = actualX
+  self.y = actualY
 end
 
-function PunkChar:kickEnd()
-  self.isKicking = false
-  local hitbox = nil
-  if self.facingRight then
-    hitbox = self.hitboxes['kick_right']
-  else
-    hitbox = self.hitboxes['kick_left']
-  end
-  self.signal:emit('kick', self, hitbox)
+function PunkChar:stop()
+  self:setCurrentAnimation('idle')
 end
 
 return PunkChar

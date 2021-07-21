@@ -71,24 +71,10 @@ end
 
 function PlayerChar:punchEnd()
   self.isPunching = false
-  local hitbox = nil
-  if self.facingRight then
-    hitbox = self.hitboxes['punch_right']
-  else
-    hitbox = self.hitboxes['punch_left']
-  end
-  self.signal:emit('punch', self, hitbox)
 end
 
 function PlayerChar:kickEnd()
   self.isKicking = false
-  local hitbox = nil
-  if self.facingRight then
-    hitbox = self.hitboxes['kick_right']
-  else
-    hitbox = self.hitboxes['kick_left']
-  end
-  self.signal:emit('kick', self, hitbox)
 end
 
 local function update_as_left(delta_time)
@@ -198,10 +184,6 @@ function PlayerChar:update(dt)
 
   local x, y, punch, kick = control(dt)
 
-  if x ~= 0 or y ~= 0 or punch or kick then
-    self.signal:emit('player_control', self)
-  end
-
   self:move(x, y)
 
   local nextAnimation = "idle"
@@ -212,12 +194,30 @@ function PlayerChar:update(dt)
       self:faceRight()
     end
     nextAnimation = 'walk'
-  elseif punch and not ( self.isPunching or self.isKicking) then
+  elseif punch and not (self.isPunching or self.isKicking) then
     nextAnimation = 'punch'
     self.isPunching = true
+
+    local hitbox = nil
+    if self.facingRight then
+      hitbox = self.hitboxes['punch_right']
+    else
+      hitbox = self.hitboxes['punch_left']
+    end
+
+    self.signal:emit('punch', self, hitbox)
   elseif kick and not (self.isKicking or self.isKicking) then
     nextAnimation = 'kick'
     self.isKicking = true
+
+    local hitbox = nil
+    if self.facingRight then
+      hitbox = self.hitboxes['kick_right']
+    else
+      hitbox = self.hitboxes['kick_left']
+    end
+
+    self.signal:emit('kick', self, hitbox)
   end
 
   self:setCurrentAnimation(nextAnimation)
